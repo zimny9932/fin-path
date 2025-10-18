@@ -1,1 +1,17 @@
-.idea
+
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+/vendor/
+###< symfony/framework-bundle ###
+
+./docker-compose.yml
+./.idea
+./frontend/node_modules/
+./frontend/.astro/
+./frontend/.env
+./frontend/.env.production
