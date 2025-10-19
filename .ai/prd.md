@@ -141,3 +141,4 @@ Następujące funkcjonalności nie wchodzą w zakres wersji MVP (Minimum Viable 
 *   Retencja: Co najmniej 40% użytkowników powraca do aplikacji po pierwszym miesiącu użytkowania.
 *   Stabilność: 99% sesji użytkowników odbywa się bez błędów krytycznych i awarii aplikacji.
 *   Zrozumienie danych: Użytkownik jest w stanie w mniej niż 1 minutę od zalogowania odnaleźć informację o aktualnym poziomie realizacji budżetu miesięcznego.
+

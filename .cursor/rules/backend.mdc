@@ -1,0 +1,74 @@
+---
+description: 
+globs: src/**/*.php
+alwaysApply: false
+---
+### Backend and Database
+
+Key Principles
+- Write concise, well-structured, object-oriented code following SOLID and DRY principles.
+- Use dependency injection throughout the application via Symfony’s service container.
+- Favor modular and reusable components; avoid duplicated logic.
+- Use descriptive, intention-revealing class, method, and variable names.
+- Follow PSR-12 and Symfony coding standards.
+- Leverage Symfony’s configuration flexibility and environment separation.
+
+PHP/Symfony
+- Use PHP 8.4+ language features (readonly classes, typed class constants, intersection types, attributes).
+- Define API resources using #[ApiResource] attributes.
+- Split business logic:
+    - Provider → data retrieval and transformation
+    - Processor → command execution, validation, events
+- Enable OpenAPI schema generation.
+- Always declare strict types: declare(strict_types=1);
+- Use Symfony's built-in features—avoid reinventing core framework components.
+- Structure code according to Symfony conventions
+- Use UUIDs as primary keys (Ramsey\Uuid or Symfony\Component\Uid).
+- Use configuration via attributes (preferred in Symfony 7.3) instead of YAML/XML when possible.
+- Apply autowiring and autoconfiguration for service registration.
+- Manage dependencies through Composer with version constraints following ^ conventions.
+
+Security & Access Control
+- Use JWT (lexik/jwt-authentication-bundle) for stateless APIs.
+- Apply granular security expressions or Voters:
+    #[ApiResource(security: "is_granted('ROLE_ADMIN') or object.owner == user")]
+- Hash passwords with PasswordHasherInterface.
+
+Error Handling and Logging
+- Use Symfony’s HttpKernel exception handling and Monolog for structured logging.
+- Create custom exceptions extending Symfony’s base Exception classes when needed.
+- Implement error boundaries with try-catch for expected cases and log meaningful context.
+- Integrate error monitoring tools via the LoggerInterface.
+
+Validation and Security
+- Use Symfony Validator and custom constraint classes for input validation.
+- Employ Symfony Security component for authentication and authorization.
+- Always validate CSRF tokens in forms.
+- Use password hashers (PasswordHasherInterface) for secure credential storage.
+
+Data Layer
+- Use Doctrine ORM for database persistence.
+- Create migrations with Doctrine Migrations.
+- Define entities with PHP 8 attributes.
+- Implement repositories using the Doctrine Repository pattern.
+- Use the EntityManager for transactions and ensure atomic operations where required.
+
+Testing
+- Use ApiTestCase for HTTP-level integration tests.
+- Seed PostgreSQL 17 using fixture classes.
+- Organize:
+    - tests/Unit/...Test.php
+    - tests/Integration/...Test.php
+    - tests/Api/...Test.php
+
+Coding Conventions
+1. Use typed properties and class constants.
+2. Prefer constructor injection for all dependencies.
+3. Use PHP attributes for configuration (Routing, Validation, ORM, Serializer).
+4. Write immutable value objects for domain logic.
+5. Always commit migrations with atomic schema changes.
+6. Use read-only services where state mutation is not needed.
+7. Handle forms with explicit mapping using DTOs when domain models shouldn’t be exposed.
+8. Prefer environment variable configuration via dotenv.
+9. Maintain .env.local for sensitive overrides (never commit).
+10. Keep service definitions slim—business logic belongs in services, not controllers.

@@ -1,0 +1,52 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# AI Rules for {app-name}
+
+{project-description}
+
+## Tech Stack
+
+- PHP 8.4
+- Symfony 7.3
+- Postgres 17
+- Astro 5
+- TypeScript 5
+- React 19
+- Tailwind 4
+- Shadcn/ui
+
+## Project Structure
+
+When introducing changes to the project, always follow the directory structure below:
+
+- `./src` - backend source code (Symfony catalog structure)
+- `./frontend/src` - frontend source code
+- `./frontend/src/layouts` - Astro layouts
+- `./frontend/src/pages` - Astro pages
+- `./frontend/src/pages/api` - API endpoints
+- `./frontend/src/middleware/index.ts` - Astro middleware
+- `./frontend/src/types.ts` - Shared types for frontend (Entities, DTOs)
+- `./frontend/src/components` - Client-side components written in Astro (static) and React (dynamic)
+- `./frontend/src/components/ui` - Client-side components from Shadcn/ui
+- `./frontend/src/lib` - Frontend services and helpers 
+- `./frontend/src/assets` - static internal assets
+- `./frontend/public` - public assets
+
+When modifying the directory structure, always update this section.
+
+## Coding practices
+
+### Guidelines for clean code
+
+- Use feedback from linters to improve the code when making changes.
+- Prioritize error handling and edge cases.
+- Handle errors and edge cases at the beginning of functions.
+- Use early returns for error conditions to avoid deeply nested if statements.
+- Place the happy path last in the function for improved readability.
+- Avoid unnecessary else statements; use if-return pattern instead.
+- Use guard clauses to handle preconditions and invalid states early.
+- Implement proper error logging and user-friendly error messages.
+- Consider using custom error types or error factories for consistent error handling.
