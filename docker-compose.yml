@@ -7,14 +7,31 @@ services:
         volumes:
             - ./:/var/www/html
         restart: unless-stopped
+        depends_on:
+            - postgres
 
     nginx:
         image: nginx:alpine
         ports:
-            - "8080:80"
+            - "8081:80"
         volumes:
             - ./:/var/www/html
             - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
         depends_on:
             - php
         restart: unless-stopped
+
+    postgres:
+        image: postgres:17-alpine
+        environment:
+            POSTGRES_DB: fin_path
+            POSTGRES_USER: app
+            POSTGRES_PASSWORD: 'app'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        restart: unless-stopped
+
+volumes:
+    postgres_data: {}
