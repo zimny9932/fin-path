@@ -1,3 +1,7 @@
+api_login:
+    path: /api/login
+    methods: ['POST']
+
 controllers:
     resource:
         path: ../src/Controller/

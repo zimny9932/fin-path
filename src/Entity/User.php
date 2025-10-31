@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\OpenApi\Model;
 use App\DTO\RegistrationInput;
 use App\DTO\RegistrationOutput;
 use App\Exception\UserAlreadyExistsException;
@@ -26,6 +27,18 @@ use Symfony\Component\Uid\Uuid;
             output: RegistrationOutput::class,
             processor: UserRegistrationProcessor::class,
             exceptionToStatus: [UserAlreadyExistsException::class => 409]
+        ),
+        new Post(
+            uriTemplate: '/login',
+            security: "is_granted('PUBLIC_ACCESS')",
+            input: false,
+            output: false,
+        ),
+        new Post(
+            uriTemplate: '/token/refresh',
+            security: "is_granted('PUBLIC_ACCESS')",
+            input: false,
+            output: false,
         ),
     ],
     graphQlOperations: []
