@@ -4,17 +4,37 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Post;
+use App\DTO\RegistrationInput;
+use App\DTO\RegistrationOutput;
+use App\Exception\UserAlreadyExistsException;
 use App\Repository\UserRepository;
+use App\Service\UserRegistrationProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
+#[ApiResource(
+    operations: [
+        new Post(
+            uriTemplate: '/register',
+            input: RegistrationInput::class,
+            output: RegistrationOutput::class,
+            processor: UserRegistrationProcessor::class,
+            exceptionToStatus: [UserAlreadyExistsException::class => 409]
+        ),
+    ],
+    graphQlOperations: []
+)]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
 #[ORM\HasLifecycleCallbacks]
 #[UniqueEntity('email')]
-class User
+class User implements PasswordAuthenticatedUserInterface, UserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
@@ -72,6 +92,16 @@ class User
         return $this->passwordHash;
     }
 
+    public function setPasswordHash(string $passwordHash): void
+    {
+        $this->passwordHash = $passwordHash;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->passwordHash;
+    }
+
     public function getBillingCycleStartDay(): ?int
     {
         return $this->billingCycleStartDay;
@@ -80,5 +110,21 @@ class User
     public function setBillingCycleStartDay(?int $billingCycleStartDay): void
     {
         $this->billingCycleStartDay = $billingCycleStartDay;
+    }
+
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // e.g. plain passwords
+    }
+
+    public function getUserIdentifier(): string
+    {
+        return $this->email;
     }
 }
