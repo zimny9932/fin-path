@@ -23,4 +23,9 @@ enum MainCategory: string
     case BUSINESS = 'Business';
     case INVESTMENT_INCOME = 'Investment Income';
     case GIFTS = 'Gifts';
+
+    public static function values(): array
+    {
+        return array_column(self::cases(), 'value');
+    }
 }

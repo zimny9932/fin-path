@@ -4,29 +4,21 @@ declare(strict_types=1);
 
 namespace App\Serializer;
 
-use App\DTO\SubcategoryOutput;
 use App\Entity\Subcategory;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-final class SubcategoryNormalizer implements NormalizerInterface
+final readonly class SubcategoryNormalizer implements NormalizerInterface
 {
-    public function __construct(
-        #[Autowire(service: 'serializer.normalizer.object')]
-        private readonly NormalizerInterface $normalizer
-    ) {
-    }
-
     /**
-     * @param Subcategory $object
+     * @param Subcategory $data
      */
-    public function normalize(mixed $object, string $format = null, array $context = []): array
+    public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
         return [
-            'id' => $object->getId()->toRfc4122(),
-            'name' => $object->getName(),
-            'type' => $object->getType()->value,
-            'mainCategory' => $object->getMainCategory()->value,
+            'id' => $data->getId()->toRfc4122(),
+            'name' => $data->getName(),
+            'type' => $data->getType()->value,
+            'mainCategory' => $data->getMainCategory()->value,
         ];
     }
 

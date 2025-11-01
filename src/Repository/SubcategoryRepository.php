@@ -35,4 +35,15 @@ class SubcategoryRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    public function findOneByNameAndUser(string $name, User $user): ?Subcategory
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.user = :user')
+            ->andWhere('s.name = :name')
+            ->setParameter('user', $user)
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

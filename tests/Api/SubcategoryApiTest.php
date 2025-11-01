@@ -84,6 +84,89 @@ final class SubcategoryApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
+    public function testCreateSubcategorySuccess(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $client = $this->createClientWithCredentials($user);
+
+        $client->request('POST', '/api/subcategories', [
+            'json' => [
+                'name' => 'Internet Bill',
+                'type' => 'expense',
+                'mainCategory' => 'Housing',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        self::assertResponseHeaderSame('content-type', 'application/ld+json; charset=utf-8');
+        self::assertJsonContains([
+            'name' => 'Internet Bill',
+            'type' => 'expense',
+            'mainCategory' => 'Housing',
+        ]);
+
+        $subcategoryRepository = self::getContainer()->get(\App\Repository\SubcategoryRepository::class);
+        $savedSubcategory = $subcategoryRepository->findOneByNameAndUser('Internet Bill', $user);
+        self::assertNotNull($savedSubcategory);
+        self::assertSame('Internet Bill', $savedSubcategory->getName());
+    }
+
+    public function testCreateSubcategoryValidationError(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $client = $this->createClientWithCredentials($user);
+
+        $client->request('POST', '/api/subcategories', [
+            'json' => [
+                'name' => 'a', // too short
+                'type' => 'invalid_type',
+                'mainCategory' => 'INVALID_CATEGORY',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        self::assertJsonContains([
+            'violations' => [
+                ['propertyPath' => 'name', 'message' => 'Subcategory name must be at least 2 characters long'],
+                ['propertyPath' => 'type', 'message' => 'The value you selected is not a valid choice.'],
+                ['propertyPath' => 'mainCategory', 'message' => 'The value you selected is not a valid choice.'],
+            ],
+        ]);
+    }
+
+    public function testCreateSubcategoryConflict(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $this->createSubcategory($user, 'Salary', TransactionType::INCOME, MainCategory::SALARY);
+        $client = $this->createClientWithCredentials($user);
+
+        $client->request('POST', '/api/subcategories', [
+            'json' => [
+                'name' => 'Salary',
+                'type' => 'income',
+                'mainCategory' => 'Salary',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_CONFLICT);
+        self::assertJsonContains([
+            'message' => 'Subcategory with the same name already exists for this user.',
+        ]);
+    }
+
+    public function testCreateSubcategoryFailsForUnauthenticatedUser(): void
+    {
+        static::createClient()->request('POST', '/api/subcategories', [
+            'json' => [
+                'name' => 'Internet Bill',
+                'type' => 'expense',
+                'mainCategory' => 'Housing',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
+
     private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): void
     {
         $subcategory = new Subcategory($user, $name, $type, $mainCategory);

@@ -8,11 +8,14 @@ use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use App\DTO\SubcategoryInput;
 use App\DTO\SubcategoryOutput;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Repository\SubcategoryRepository;
 use App\State\SubcategoryCollectionProvider;
+use App\State\SubcategoryProcessor;
 use App\State\SubcategoryUserFilterProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -24,10 +27,16 @@ use Symfony\Component\Uid\Uuid;
         new GetCollection(
             security: "is_granted('ROLE_USER')",
         ),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            input: SubcategoryInput::class,
+            output: SubcategoryOutput::class,
+            processor: SubcategoryProcessor::class
+        ),
     ],
     graphQlOperations: []
 )]
-#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact', 'user' => 'exact'])]
+#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact'])]
 #[ORM\Entity(repositoryClass: SubcategoryRepository::class)]
 #[ORM\Table(name: 'subcategories')]
 #[ORM\HasLifecycleCallbacks]
