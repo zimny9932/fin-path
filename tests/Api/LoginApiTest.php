@@ -51,8 +51,8 @@ class LoginApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(200);
 
         $data = $response->toArray();
-        $this->assertArrayHasKey('token', $data);
-        $this->assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('token', $data);
+        self::assertArrayHasKey('refresh_token', $data);
     }
 
     /**

@@ -55,8 +55,8 @@ class TokenRefreshApiTest extends ApiTestCase
 
         self::assertResponseStatusCodeSame(200);
         $data = $refreshResponse->toArray();
-        $this->assertArrayHasKey('token', $data);
-        $this->assertArrayHasKey('refresh_token', $data);
+        self::assertArrayHasKey('token', $data);
+        self::assertArrayHasKey('refresh_token', $data);
     }
 
     /**

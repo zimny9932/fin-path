@@ -48,12 +48,12 @@ class RegistrationApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(201);
 
         $data = $response->toArray();
-        $this->assertArrayHasKey('token', $data);
-        $this->assertArrayHasKey('refreshToken', $data);
+        self::assertArrayHasKey('token', $data);
+        self::assertArrayHasKey('refreshToken', $data);
 
         /** @var User|null $user */
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => 'test@example.com']);
-        $this->assertNotNull($user);
+        self::assertNotNull($user);
     }
 
     /**

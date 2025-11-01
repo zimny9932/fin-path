@@ -4,14 +4,30 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\DTO\SubcategoryOutput;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Repository\SubcategoryRepository;
+use App\State\SubcategoryCollectionProvider;
+use App\State\SubcategoryUserFilterProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\Uuid;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_USER')",
+        ),
+    ],
+    graphQlOperations: []
+)]
+#[ApiFilter(SearchFilter::class, properties: ['type' => 'exact', 'user' => 'exact'])]
 #[ORM\Entity(repositoryClass: SubcategoryRepository::class)]
 #[ORM\Table(name: 'subcategories')]
 #[ORM\HasLifecycleCallbacks]
