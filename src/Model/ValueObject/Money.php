@@ -26,7 +26,7 @@ final readonly class Money
     public static function fromString(string $amount, ?string $currency = null): self
     {
         return new self(
-            (int) ((BigDecimal::of($amount))->withScale(self::PRECISION, RoundingMode::HALF_UP)
+            (int) ((BigDecimal::of($amount))->toScale(self::PRECISION, RoundingMode::HALF_UP)
                 ->toBigDecimal()
                 ->getUnscaledValue()
                 ->toInt()),

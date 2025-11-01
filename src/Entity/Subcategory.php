@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\DTO\SubcategoryInput;
@@ -14,9 +15,8 @@ use App\DTO\SubcategoryOutput;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Repository\SubcategoryRepository;
-use App\State\SubcategoryCollectionProvider;
+use App\State\RecentSubcategoriesProvider;
 use App\State\SubcategoryProcessor;
-use App\State\SubcategoryUserFilterProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -26,6 +26,13 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new GetCollection(
             security: "is_granted('ROLE_USER')",
+        ),
+        new GetCollection(
+            uriTemplate: '/recent-subcategories',
+            uriVariables: [],
+            security: "is_granted('ROLE_USER')",
+            name: 'get_recent_subcategories',
+            provider: RecentSubcategoriesProvider::class,
         ),
         new Post(
             security: "is_granted('ROLE_USER')",
@@ -115,3 +122,4 @@ class Subcategory
         return $this->mainCategory;
     }
 }
+

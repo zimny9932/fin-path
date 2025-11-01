@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Subcategory;
+use App\Entity\Transaction;
 use App\Entity\User;
 use App\Enum\TransactionType;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -45,5 +46,22 @@ class SubcategoryRepository extends ServiceEntityRepository
             ->setParameter('name', $name)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    /**
+     * @return array<Subcategory>
+     */
+    public function findRecentForUser(User $user, int $limit): array
+    {
+        return $this->createQueryBuilder('s')
+            ->select('s')
+            ->innerJoin(Transaction::class, 't', 'WITH', 't.subcategory = s.id')
+            ->where('s.user = :user')
+            ->setParameter('user', $user)
+            ->groupBy('s.id')
+            ->orderBy('MAX(t.date)', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 }
