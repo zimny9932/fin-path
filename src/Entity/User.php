@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
 use App\DTO\RegistrationInput;
 use App\DTO\RegistrationOutput;
+use App\DTO\UserOutput;
 use App\Exception\UserAlreadyExistsException;
 use App\Repository\UserRepository;
 use App\Service\UserRegistrationProcessor;
+use App\State\MeProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -21,6 +24,12 @@ use Symfony\Component\Uid\Uuid;
 
 #[ApiResource(
     operations: [
+        new Get(
+            uriTemplate: '/users/me',
+            provider: MeProvider::class,
+            output: UserOutput::class,
+            security: "is_granted('ROLE_USER')",
+        ),
         new Post(
             uriTemplate: '/register',
             input: RegistrationInput::class,
