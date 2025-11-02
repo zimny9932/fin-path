@@ -66,3 +66,5 @@ Celem tego punktu końcowego jest umożliwienie uwierzytelnionemu użytkownikowi
     - Zaimplementować test próby usunięcia transakcji z nieprawidłowym formatem UUID w URL (oczekiwany status `404`).
 3.  **Weryfikacja zmian**:
     - Uruchomić zestaw testów, aby upewnić się, że nowa funkcjonalność działa zgodnie z oczekiwaniami i nie narusza istniejących testów.
+
+

@@ -4,24 +4,42 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiProperty;
+use App\DTO\BudgetOutput;
 use App\Model\ValueObject\Money;
 use App\Repository\BudgetRepository;
+use App\State\BudgetProvider;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: BudgetRepository::class)]
 #[ORM\Table(name: 'budgets')]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(name: 'uq_budget_user_year_month', columns: ['user_id', 'year', 'month'])]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/budgets/{year}/{month}',
+            requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'],
+            security: "is_granted('ROLE_USER')",
+            output: BudgetOutput::class,
+            provider: BudgetProvider::class
+        ),
+    ]
+)]
 class Budget
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    #[ApiProperty(identifier: false)]
     private Uuid $id;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -29,9 +47,11 @@ class Budget
     private User $user;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[ApiProperty(identifier: true)]
     private int $year;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[ApiProperty(identifier: true)]
     private int $month;
 
     #[ORM\Column(name: 'planned_income', type: 'money', options: ['jsonb' => true])]
@@ -73,7 +93,7 @@ class Budget
     {
         return $this->id;
     }
-    
+
     public function getUser(): User
     {
         return $this->user;
@@ -93,7 +113,7 @@ class Budget
     {
         return $this->plannedIncome;
     }
-    
+
     /**
      * @return Collection<int, BudgetLimit>
      */
@@ -101,4 +121,15 @@ class Budget
     {
         return $this->budgetLimits;
     }
+
+    public function setYear(int $year): void
+    {
+        $this->year = $year;
+    }
+
+    public function setMonth(int $month): void
+    {
+        $this->month = $month;
+    }
+
 }

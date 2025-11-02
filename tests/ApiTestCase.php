@@ -9,6 +9,8 @@ use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Entity\Subcategory;
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Entity\Budget;
+use App\Entity\BudgetLimit;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Model\ValueObject\Money;
@@ -60,6 +62,24 @@ abstract class ApiTestCase extends BaseApiTestCase
         $this->entityManager()->flush();
 
         return $subcategory;
+    }
+
+    protected function createBudget(User $user, int $year, int $month, Money $plannedIncome): Budget
+    {
+        $budget = new Budget($user, $year, $month, $plannedIncome);
+        $this->entityManager()->persist($budget);
+        $this->entityManager()->flush();
+
+        return $budget;
+    }
+
+    protected function createBudgetLimit(Budget $budget, Subcategory $subcategory, Money $limitAmount): BudgetLimit
+    {
+        $budgetLimit = new BudgetLimit($budget, $subcategory, $limitAmount);
+        $this->entityManager()->persist($budgetLimit);
+        $this->entityManager()->flush();
+
+        return $budgetLimit;
     }
 
     private function getToken(User $user): string

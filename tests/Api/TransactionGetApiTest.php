@@ -27,7 +27,7 @@ class TransactionGetApiTest extends ApiTestCase
         $transaction = new Transaction(
             $user,
             $subcategory,
-            \App\Model\ValueObject\Money::fromPrimitives(12345, 'PLN'),
+            Money::fromPrimitives(12345, 'PLN'),
             new \DateTimeImmutable('2025-01-01'),
             'Test description'
         );
