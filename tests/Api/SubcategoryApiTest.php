@@ -8,6 +8,7 @@ use App\Entity\Subcategory;
 use App\Entity\User;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
+use App\Model\ValueObject\Money;
 use App\Tests\ApiTestCase;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -295,7 +296,7 @@ final class SubcategoryApiTest extends ApiTestCase
     {
         $user = $this->createUser('user@example.com', 'password');
         $subcategory = $this->createSubcategory($user, 'Groceries', TransactionType::EXPENSE, MainCategory::FOOD);
-        $this->createTransaction($user, $subcategory, 10000, new \DateTimeImmutable());
+        $this->createTransaction($user, $subcategory, Money::fromPrimitives(10000, 'PLN'), new \DateTimeImmutable());
 
         $client = $this->createClientWithCredentials($user);
         $client->request('DELETE', '/api/subcategories/' . $subcategory->getId());

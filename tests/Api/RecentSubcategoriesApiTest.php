@@ -53,37 +53,37 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Salary'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-01')
         ); // 6th most recent
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Gifts'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-02')
         ); // 5th
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Internet'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-03')
         ); // 4th
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Fuel'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-04')
         ); // 3rd
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Groceries'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-05')
         ); // 2nd
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Side Hustle'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-06')
         ); // 1st
 
@@ -110,14 +110,14 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Salary'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-01')
         );
-        $this->createTransaction($user, $this->getSubcategoryByName('Fuel'), 10000, new \DateTimeImmutable('2025-01-02'));
+        $this->createTransaction($user, $this->getSubcategoryByName('Fuel'), Money::fromPrimitives(10000, 'PLN'), new \DateTimeImmutable('2025-01-02'));
         $this->createTransaction(
             $user,
             $this->getSubcategoryByName('Groceries'),
-            10000,
+            Money::fromPrimitives(10000, 'PLN'),
             new \DateTimeImmutable('2025-01-03')
         );
 

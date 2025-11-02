@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use ApiPlatform\State\ProcessorInterface;
 use App\DTO\TransactionInput;
+use App\Entity\Subcategory;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Model\ValueObject\Money;
@@ -31,13 +34,24 @@ final class TransactionProcessor implements ProcessorInterface
     {
         /** @var User $user */
         $user = $this->security->getUser();
+        $subcategory = $this->findSubcategoryForUser($user, $data->subcategoryId);
 
-        $subcategory = $this->subcategoryRepository->findForUser($user, $data->subcategoryId);
-
-        if (!$subcategory) {
-            throw new NotFoundHttpException('Subcategory not found');
+        if ($operation instanceof Post) {
+            return $this->createTransaction($data, $user, $subcategory);
         }
 
+        if ($operation instanceof Put) {
+            /** @var Transaction $transaction */
+            $transaction = $context['previous_data'];
+
+            return $this->updateTransaction($transaction, $data, $subcategory);
+        }
+
+        throw new \LogicException('This processor does not support the given operation.');
+    }
+
+    private function createTransaction(TransactionInput $data, User $user, Subcategory $subcategory): Transaction
+    {
         $money = Money::fromPrimitives($data->amount->amount, $data->amount->currency);
         $date = new \DateTimeImmutable($data->date);
 
@@ -55,8 +69,34 @@ final class TransactionProcessor implements ProcessorInterface
         return $transaction;
     }
 
+    private function updateTransaction(Transaction $transaction, TransactionInput $data, Subcategory $subcategory): Transaction
+    {
+        $money = Money::fromPrimitives($data->amount->amount, $data->amount->currency);
+        $date = new \DateTimeImmutable($data->date);
+
+        $transaction->setSubcategory($subcategory);
+        $transaction->setAmount($money);
+        $transaction->setDate($date);
+        $transaction->setDescription($data->description);
+
+        $this->entityManager->flush();
+
+        return $transaction;
+    }
+
+    private function findSubcategoryForUser(User $user, string $subcategoryId): Subcategory
+    {
+        $subcategory = $this->subcategoryRepository->findForUser($user, $subcategoryId);
+
+        if (!$subcategory) {
+            throw new NotFoundHttpException('Subcategory not found');
+        }
+
+        return $subcategory;
+    }
+
     public function supports(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): bool
     {
-        return $data instanceof TransactionInput && $operation->getName() === '_api_/api/transactions_post';
+        return $data instanceof TransactionInput;
     }
 }

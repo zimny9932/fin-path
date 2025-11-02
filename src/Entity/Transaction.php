@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\DTO\PaginatedTransactionOutput;
 use App\DTO\TransactionInput;
 use App\DTO\TransactionOutput;
@@ -18,6 +19,7 @@ use App\Doctrine\Type\MoneyType;
 use App\Entity\Contract\UserOwnedInterface;
 use App\Model\ValueObject\Money;
 use App\Repository\TransactionRepository;
+use App\State\TransactionInputDataTransformer;
 use App\State\TransactionProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -34,6 +36,12 @@ use Symfony\Component\Uid\Uuid;
         ),
         new Post(
             security: "is_granted('ROLE_USER')",
+            input: TransactionInput::class,
+            output: TransactionOutput::class,
+            processor: TransactionProcessor::class
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
             input: TransactionInput::class,
             output: TransactionOutput::class,
             processor: TransactionProcessor::class
@@ -139,5 +147,25 @@ class Transaction implements UserOwnedInterface
     public function getDescription(): ?string
     {
         return $this->description;
+    }
+
+    public function setSubcategory(Subcategory $subcategory): void
+    {
+        $this->subcategory = $subcategory;
+    }
+
+    public function setAmount(Money $amount): void
+    {
+        $this->amount = $amount;
+    }
+
+    public function setDate(\DateTimeImmutable $date): void
+    {
+        $this->date = $date;
+    }
+
+    public function setDescription(?string $description): void
+    {
+        $this->description = $description;
     }
 }

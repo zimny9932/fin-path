@@ -42,13 +42,15 @@ abstract class ApiTestCase extends BaseApiTestCase
     protected function createTransaction(
         User $user,
         Subcategory $subcategory,
-        int $amount,
+        Money $amount,
         \DateTimeImmutable $date,
         ?string $description = null
-    ): void {
-        $transaction = new Transaction($user, $subcategory, Money::fromPrimitives($amount, 'PLN'), $date, $description);
+    ): Transaction {
+        $transaction = new Transaction($user, $subcategory, $amount, $date, $description);
         $this->entityManager()->persist($transaction);
         $this->entityManager()->flush();
+
+        return $transaction;
     }
 
     protected function createSubcategory(User $user, string $name, ?TransactionType $type = TransactionType::EXPENSE, ?MainCategory $mainCategory = MainCategory::FOOD): Subcategory
