@@ -30,6 +30,8 @@ final readonly class TransactionOutput
             'subcategory' => [
                 'id' => $this->subcategory->id,
                 'name' => $this->subcategory->name,
+                'mainCategory' => $this->subcategory->mainCategory->value,
+                'type' => $this->subcategory->type->value,
             ]
         ];
     }

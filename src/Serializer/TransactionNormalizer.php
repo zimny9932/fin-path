@@ -27,7 +27,12 @@ final class TransactionNormalizer implements NormalizerInterface
             new MoneyOutput($data->getAmount()->amount, $data->getAmount()->currency),
             $data->getDate(),
             $data->getDescription(),
-            new SubcategoryNestedOutput($data->getSubcategory()->getId(), $data->getSubcategory()->getName()),
+            new SubcategoryNestedOutput(
+                $data->getSubcategory()->getId(),
+                $data->getSubcategory()->getName(),
+                $data->getSubcategory()->getMainCategory(),
+                $data->getSubcategory()->getType()
+            ),
         ))->toArray();
     }
 

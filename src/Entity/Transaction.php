@@ -8,6 +8,7 @@ use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\DTO\PaginatedTransactionOutput;
@@ -24,6 +25,10 @@ use Symfony\Component\Uid\Uuid;
 
 #[ApiResource(
     operations: [
+        new Get(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+            output: TransactionOutput::class
+        ),
         new GetCollection(
             security: "is_granted('ROLE_USER')",
         ),
