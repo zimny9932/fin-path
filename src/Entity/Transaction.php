@@ -12,6 +12,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\DTO\PaginatedTransactionOutput;
 use App\DTO\TransactionInput;
 use App\DTO\TransactionOutput;
@@ -45,6 +46,9 @@ use Symfony\Component\Uid\Uuid;
             input: TransactionInput::class,
             output: TransactionOutput::class,
             processor: TransactionProcessor::class
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
         ),
     ],
     paginationClientItemsPerPage: true,
