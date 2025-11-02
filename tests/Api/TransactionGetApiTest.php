@@ -106,13 +106,4 @@ final class TransactionGetApiTest extends ApiTestCase
         self::assertCount(2, $data['member']);
         self::assertSame(3000, $data['member'][0]['amount']['amount']);
     }
-
-    private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): Subcategory
-    {
-        $subcategory = new Subcategory($user, $name, $type, $mainCategory);
-        $this->entityManager()->persist($subcategory);
-        $this->entityManager()->flush();
-
-        return $subcategory;
-    }
 }

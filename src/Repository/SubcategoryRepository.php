@@ -54,6 +54,17 @@ class SubcategoryRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    public function findForUser(User $user, string $id): ?Subcategory
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.user = :user')
+            ->andWhere('s.id = :id')
+            ->setParameter('user', $user)
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     /**
      * @return array<Subcategory>
      */

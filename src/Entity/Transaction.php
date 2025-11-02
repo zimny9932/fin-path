@@ -9,11 +9,15 @@ use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\DTO\PaginatedTransactionOutput;
+use App\DTO\TransactionInput;
+use App\DTO\TransactionOutput;
 use App\Doctrine\Type\MoneyType;
 use App\Entity\Contract\UserOwnedInterface;
 use App\Model\ValueObject\Money;
 use App\Repository\TransactionRepository;
+use App\State\TransactionProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -22,6 +26,12 @@ use Symfony\Component\Uid\Uuid;
     operations: [
         new GetCollection(
             security: "is_granted('ROLE_USER')",
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            input: TransactionInput::class,
+            output: TransactionOutput::class,
+            processor: TransactionProcessor::class
         ),
     ],
     paginationClientItemsPerPage: true,

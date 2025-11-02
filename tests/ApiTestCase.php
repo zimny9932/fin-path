@@ -9,6 +9,8 @@ use ApiPlatform\Symfony\Bundle\Test\Client;
 use App\Entity\Subcategory;
 use App\Entity\Transaction;
 use App\Entity\User;
+use App\Enum\MainCategory;
+use App\Enum\TransactionType;
 use App\Model\ValueObject\Money;
 use Doctrine\ORM\EntityManagerInterface;
 
@@ -47,6 +49,15 @@ abstract class ApiTestCase extends BaseApiTestCase
         $transaction = new Transaction($user, $subcategory, Money::fromPrimitives($amount, 'PLN'), $date, $description);
         $this->entityManager()->persist($transaction);
         $this->entityManager()->flush();
+    }
+
+    protected function createSubcategory(User $user, string $name, ?TransactionType $type = TransactionType::EXPENSE, ?MainCategory $mainCategory = MainCategory::FOOD): Subcategory
+    {
+        $subcategory = new Subcategory($user, $name, $type, $mainCategory);
+        $this->entityManager()->persist($subcategory);
+        $this->entityManager()->flush();
+
+        return $subcategory;
     }
 
     private function getToken(User $user): string

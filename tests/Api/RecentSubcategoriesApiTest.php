@@ -146,13 +146,6 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_BAD_REQUEST);
     }
 
-    private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): void
-    {
-        $subcategory = new Subcategory($user, $name, $type, $mainCategory);
-        $this->entityManager()->persist($subcategory);
-        $this->entityManager()->flush();
-    }
-
     private function getSubcategoryByName(string $name): Subcategory
     {
         return $this->entityManager()->getRepository(Subcategory::class)->findOneBy(['name' => $name]);
