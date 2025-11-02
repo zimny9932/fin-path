@@ -167,6 +167,115 @@ final class SubcategoryApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
     }
 
+    public function testUpdateSubcategory(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $subcategory = new Subcategory($user, 'Groceries', TransactionType::EXPENSE, MainCategory::FOOD);
+        $this->entityManager()->persist($subcategory);
+        $this->entityManager()->flush();
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('PUT', '/api/subcategories/' . $subcategory->getId(), [
+            'json' => [
+                'name' => 'Groceries & Food',
+                'type' => 'expense',
+                'mainCategory' => 'Food',
+            ],
+        ]);
+
+        self::assertResponseIsSuccessful();
+        self::assertJsonContains([
+            'name' => 'Groceries & Food',
+            'mainCategory' => 'Food',
+        ]);
+    }
+
+    public function testUpdateSubcategoryWithExistingName(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $this->createSubcategory($user, 'Bills', TransactionType::EXPENSE, MainCategory::HOUSING);
+
+        $subcategoryToUpdate = new Subcategory($user, 'Groceries', TransactionType::EXPENSE, MainCategory::FOOD);
+        $this->entityManager()->persist($subcategoryToUpdate);
+        $this->entityManager()->flush();
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('PUT', '/api/subcategories/' . $subcategoryToUpdate->getId(), [
+            'json' => [
+                'name' => 'Bills', // Existing name
+                'type' => 'expense',
+                'mainCategory' => 'Housing',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_CONFLICT);
+        self::assertJsonContains([
+            'message' => 'Subcategory with the same name already exists for this user.',
+        ]);
+    }
+
+    public function testUpdateSubcategoryOfAnotherUser(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $anotherUser = $this->createUser('another-user@example.com', 'password');
+        $subcategoryOfAnotherUser = new Subcategory($anotherUser, 'Another User Subcategory', TransactionType::EXPENSE, MainCategory::FOOD);
+        $this->entityManager()->persist($subcategoryOfAnotherUser);
+        $this->entityManager()->flush();
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('PUT', '/api/subcategories/' . $subcategoryOfAnotherUser->getId(), [
+            'json' => [
+                'name' => 'Attempt to update',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testUpdateSubcategoryWithInvalidData(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $subcategory = new Subcategory($user, 'Groceries', TransactionType::EXPENSE, MainCategory::FOOD);
+        $this->entityManager()->persist($subcategory);
+        $this->entityManager()->flush();
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('PUT', '/api/subcategories/' . $subcategory->getId(), [
+            'json' => [
+                'name' => 'a', // Too short
+                'type' => 'invalid_type',
+                'mainCategory' => 'INVALID_CATEGORY',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
+        self::assertJsonContains([
+            'violations' => [
+                ['propertyPath' => 'name', 'message' => 'Subcategory name must be at least 2 characters long'],
+                ['propertyPath' => 'type', 'message' => 'The value you selected is not a valid choice.'],
+                ['propertyPath' => 'mainCategory', 'message' => 'The value you selected is not a valid choice.'],
+            ],
+        ]);
+    }
+
+    public function testUpdateNonExistentSubcategory(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $client = $this->createClientWithCredentials($user);
+
+        $nonExistentUuid = \Symfony\Component\Uid\Uuid::v7();
+
+        $client->request('PUT', '/api/subcategories/' . $nonExistentUuid, [
+            'json' => [
+                'name' => 'This will fail',
+                'type' => 'expense',
+                'mainCategory' => 'Food',
+            ],
+        ]);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
     private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): void
     {
         $subcategory = new Subcategory($user, $name, $type, $mainCategory);

@@ -10,6 +10,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\DTO\SubcategoryInput;
 use App\DTO\SubcategoryOutput;
 use App\Enum\MainCategory;
@@ -25,7 +26,7 @@ use Symfony\Component\Uid\Uuid;
 #[ApiResource(
     operations: [
         new Get(
-            security: "is_granted('ROLE_USER')",
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
             output: SubcategoryOutput::class
         ),
         new GetCollection(
@@ -40,6 +41,12 @@ use Symfony\Component\Uid\Uuid;
         ),
         new Post(
             security: "is_granted('ROLE_USER')",
+            input: SubcategoryInput::class,
+            output: SubcategoryOutput::class,
+            processor: SubcategoryProcessor::class
+        ),
+        new Put(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
             input: SubcategoryInput::class,
             output: SubcategoryOutput::class,
             processor: SubcategoryProcessor::class
@@ -124,6 +131,21 @@ class Subcategory
     public function getMainCategory(): MainCategory
     {
         return $this->mainCategory;
+    }
+
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    public function setType(TransactionType $type): void
+    {
+        $this->type = $type;
+    }
+
+    public function setMainCategory(MainCategory $mainCategory): void
+    {
+        $this->mainCategory = $mainCategory;
     }
 }
 
