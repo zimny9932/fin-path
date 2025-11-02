@@ -11,6 +11,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Delete;
 use App\DTO\SubcategoryInput;
 use App\DTO\SubcategoryOutput;
 use App\Enum\MainCategory;
@@ -49,6 +50,10 @@ use Symfony\Component\Uid\Uuid;
             security: "is_granted('ROLE_USER') and object.getUser() == user",
             input: SubcategoryInput::class,
             output: SubcategoryOutput::class,
+            processor: SubcategoryProcessor::class
+        ),
+        new Delete(
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
             processor: SubcategoryProcessor::class
         ),
     ],

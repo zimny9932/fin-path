@@ -6,7 +6,10 @@ namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\ApiTestCase as BaseApiTestCase;
 use ApiPlatform\Symfony\Bundle\Test\Client;
+use App\Entity\Subcategory;
+use App\Entity\Transaction;
 use App\Entity\User;
+use App\Model\ValueObject\Money;
 use Doctrine\ORM\EntityManagerInterface;
 
 abstract class ApiTestCase extends BaseApiTestCase
@@ -32,6 +35,18 @@ abstract class ApiTestCase extends BaseApiTestCase
     protected function createClientWithCredentials(User $user): Client
     {
         return static::createClient([], ['headers' => ['authorization' => 'Bearer '.$this->getToken($user)]]);
+    }
+
+    protected function createTransaction(
+        User $user,
+        Subcategory $subcategory,
+        int $amount,
+        \DateTimeImmutable $date,
+        ?string $description = null
+    ): void {
+        $transaction = new Transaction($user, $subcategory, Money::fromPrimitives($amount, 'PLN'), $date, $description);
+        $this->entityManager()->persist($transaction);
+        $this->entityManager()->flush();
     }
 
     private function getToken(User $user): string

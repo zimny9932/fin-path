@@ -276,10 +276,75 @@ final class SubcategoryApiTest extends ApiTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
-    private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): void
+    public function testDeleteSubcategorySuccess(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $subcategory = $this->createSubcategory($user, 'To be deleted', TransactionType::EXPENSE, MainCategory::OTHER);
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('DELETE', '/api/subcategories/' . $subcategory->getId());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_NO_CONTENT);
+
+        $this->entityManager()->clear();
+        $deletedSubcategory = $this->entityManager()->find(Subcategory::class, $subcategory->getId());
+        self::assertNull($deletedSubcategory);
+    }
+
+    public function testDeleteSubcategoryInUse(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $subcategory = $this->createSubcategory($user, 'Groceries', TransactionType::EXPENSE, MainCategory::FOOD);
+        $this->createTransaction($user, $subcategory, 10000, new \DateTimeImmutable());
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('DELETE', '/api/subcategories/' . $subcategory->getId());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_CONFLICT);
+        self::assertJsonContains([
+            'detail' => 'This subcategory cannot be deleted because it is associated with existing transactions.',
+        ]);
+    }
+
+    public function testDeleteSubcategoryOfAnotherUser(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $anotherUser = $this->createUser('another-user@example.com', 'password');
+        $subcategoryOfAnotherUser = $this->createSubcategory($anotherUser, 'Another User Subcategory', TransactionType::EXPENSE, MainCategory::FOOD);
+
+        $client = $this->createClientWithCredentials($user);
+        $client->request('DELETE', '/api/subcategories/' . $subcategoryOfAnotherUser->getId());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testDeleteNonExistentSubcategory(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $client = $this->createClientWithCredentials($user);
+        $nonExistentUuid = \Symfony\Component\Uid\Uuid::v7();
+
+        $client->request('DELETE', '/api/subcategories/' . $nonExistentUuid);
+
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
+    }
+
+    public function testDeleteSubcategoryUnauthenticated(): void
+    {
+        $user = $this->createUser('user@example.com', 'password');
+        $subcategory = $this->createSubcategory($user, 'Some Subcategory', TransactionType::EXPENSE, MainCategory::FOOD);
+
+        static::createClient()->request('DELETE', '/api/subcategories/' . $subcategory->getId());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+    }
+
+    private function createSubcategory(User $user, string $name, TransactionType $type, MainCategory $mainCategory): Subcategory
     {
         $subcategory = new Subcategory($user, $name, $type, $mainCategory);
         $this->entityManager()->persist($subcategory);
         $this->entityManager()->flush();
+
+        return $subcategory;
     }
 }

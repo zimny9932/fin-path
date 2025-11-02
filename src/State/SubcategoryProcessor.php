@@ -12,7 +12,9 @@ use App\Entity\User;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Exception\SubcategoryAlreadyExistsException;
+use App\Exception\SubcategoryInUseException;
 use App\Repository\SubcategoryRepository;
+use App\Repository\TransactionRepository;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -27,19 +29,26 @@ final readonly class SubcategoryProcessor implements ProcessorInterface
         #[Autowire(service: 'api_platform.doctrine.orm.state.remove_processor')]
         private ProcessorInterface $removeProcessor,
         private SubcategoryRepository $subcategoryRepository,
+        private TransactionRepository $transactionRepository,
         private Security $security,
     ) {
     }
 
     /**
-     * @param SubcategoryInput $data
+     * @param Subcategory|SubcategoryInput $data
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?Subcategory
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         if ($operation instanceof DeleteOperationInterface) {
+            /** @var Subcategory $data */
+            if ($this->transactionRepository->hasTransactionsForSubcategory($data)) {
+                throw new SubcategoryInUseException();
+            }
+
             return $this->removeProcessor->process($data, $operation, $uriVariables, $context);
         }
 
+        /** @var SubcategoryInput $data */
         /** @var User|null $user */
         $user = $this->security->getUser();
         if (null === $user) {
