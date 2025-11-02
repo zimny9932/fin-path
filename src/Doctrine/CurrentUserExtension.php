@@ -8,7 +8,7 @@ use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use App\Entity\Subcategory;
+use App\Entity\Contract\UserOwnedInterface;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
@@ -45,7 +45,8 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
 
     private function addWhereUser(QueryBuilder $queryBuilder, string $resourceClass): void
     {
-        if ($resourceClass !== Subcategory::class) {
+        $reflectionClass = new \ReflectionClass($resourceClass);
+        if (!$reflectionClass->implementsInterface(UserOwnedInterface::class)) {
             return;
         }
 

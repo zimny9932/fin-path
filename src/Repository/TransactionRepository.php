@@ -21,12 +21,6 @@ class TransactionRepository extends ServiceEntityRepository
 
     public function hasTransactionsForSubcategory(Subcategory $subcategory): bool
     {
-        return null !== $this->createQueryBuilder('t')
-            ->select('t.id')
-            ->where('t.subcategory = :subcategory')
-            ->setParameter('subcategory', $subcategory)
-            ->setMaxResults(1)
-            ->getQuery()
-            ->getOneOrNullResult();
+        return $this->count(['subcategory' => $subcategory]) > 0;
     }
 }

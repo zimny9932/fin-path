@@ -50,12 +50,42 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
         $this->createSubcategory($user, 'Side Hustle', TransactionType::INCOME, MainCategory::BUSINESS);
 
         // Dates are important for ordering
-        $this->createTransaction($user, $this->getSubcategoryByName('Salary'), '2025-01-01'); // 6th most recent
-        $this->createTransaction($user, $this->getSubcategoryByName('Gifts'), '2025-01-02'); // 5th
-        $this->createTransaction($user, $this->getSubcategoryByName('Internet'), '2025-01-03'); // 4th
-        $this->createTransaction($user, $this->getSubcategoryByName('Fuel'), '2025-01-04'); // 3rd
-        $this->createTransaction($user, $this->getSubcategoryByName('Groceries'), '2025-01-05'); // 2nd
-        $this->createTransaction($user, $this->getSubcategoryByName('Side Hustle'), '2025-01-06'); // 1st
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Salary'),
+            10000,
+            new \DateTimeImmutable('2025-01-01')
+        ); // 6th most recent
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Gifts'),
+            10000,
+            new \DateTimeImmutable('2025-01-02')
+        ); // 5th
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Internet'),
+            10000,
+            new \DateTimeImmutable('2025-01-03')
+        ); // 4th
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Fuel'),
+            10000,
+            new \DateTimeImmutable('2025-01-04')
+        ); // 3rd
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Groceries'),
+            10000,
+            new \DateTimeImmutable('2025-01-05')
+        ); // 2nd
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Side Hustle'),
+            10000,
+            new \DateTimeImmutable('2025-01-06')
+        ); // 1st
 
         $client = $this->createClientWithCredentials($user);
         $response = $client->request('GET', '/api/recent-subcategories');
@@ -77,9 +107,19 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
         $this->createSubcategory($user, 'Salary', TransactionType::INCOME, MainCategory::SALARY);
         $this->createSubcategory($user, 'Fuel', TransactionType::EXPENSE, MainCategory::TRANSPORT);
 
-        $this->createTransaction($user, $this->getSubcategoryByName('Salary'), '2025-01-01');
-        $this->createTransaction($user, $this->getSubcategoryByName('Fuel'), '2025-01-02');
-        $this->createTransaction($user, $this->getSubcategoryByName('Groceries'), '2025-01-03');
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Salary'),
+            10000,
+            new \DateTimeImmutable('2025-01-01')
+        );
+        $this->createTransaction($user, $this->getSubcategoryByName('Fuel'), 10000, new \DateTimeImmutable('2025-01-02'));
+        $this->createTransaction(
+            $user,
+            $this->getSubcategoryByName('Groceries'),
+            10000,
+            new \DateTimeImmutable('2025-01-03')
+        );
 
         $client = $this->createClientWithCredentials($user);
         $response = $client->request('GET', '/api/recent-subcategories?limit=2');
@@ -116,18 +156,5 @@ final class RecentSubcategoriesApiTest extends ApiTestCase
     private function getSubcategoryByName(string $name): Subcategory
     {
         return $this->entityManager()->getRepository(Subcategory::class)->findOneBy(['name' => $name]);
-    }
-
-    private function createTransaction(User $user, Subcategory $subcategory, string $date): void
-    {
-        $transaction = new Transaction(
-            $user,
-            $subcategory,
-            Money::fromString('100.00'),
-            new \DateTimeImmutable($date),
-            'Test transaction'
-        );
-        $this->entityManager()->persist($transaction);
-        $this->entityManager()->flush();
     }
 }

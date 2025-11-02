@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Serializer;
 
+use App\DTO\SubcategoryOutput;
 use App\Entity\Subcategory;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
@@ -14,12 +15,12 @@ final readonly class SubcategoryNormalizer implements NormalizerInterface
      */
     public function normalize(mixed $data, ?string $format = null, array $context = []): array
     {
-        return [
-            'id' => $data->getId()->toRfc4122(),
-            'name' => $data->getName(),
-            'type' => $data->getType()->value,
-            'mainCategory' => $data->getMainCategory()->value,
-        ];
+        return (new SubcategoryOutput(
+            $data->getId(),
+            $data->getName(),
+            $data->getType(),
+            $data->getMainCategory(),
+        ))->toArray();
     }
 
     public function supportsNormalization(mixed $data, string $format = null, array $context = []): bool

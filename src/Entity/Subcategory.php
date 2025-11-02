@@ -14,6 +14,7 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 use App\DTO\SubcategoryInput;
 use App\DTO\SubcategoryOutput;
+use App\Entity\Contract\UserOwnedInterface;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Repository\SubcategoryRepository;
@@ -64,7 +65,7 @@ use Symfony\Component\Uid\Uuid;
 #[ORM\Table(name: 'subcategories')]
 #[ORM\HasLifecycleCallbacks]
 #[ORM\UniqueConstraint(name: 'uq_subcategory_user_name', columns: ['user_id', 'name'])]
-class Subcategory
+class Subcategory implements UserOwnedInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]

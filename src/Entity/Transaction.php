@@ -4,16 +4,40 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use App\DTO\PaginatedTransactionOutput;
+use App\Doctrine\Type\MoneyType;
+use App\Entity\Contract\UserOwnedInterface;
 use App\Model\ValueObject\Money;
 use App\Repository\TransactionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            security: "is_granted('ROLE_USER')",
+        ),
+    ],
+    paginationClientItemsPerPage: true,
+    paginationItemsPerPage: 30,
+    graphQlOperations: []
+)]
+#[ApiFilter(DateFilter::class, properties: ['date'])]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['date', 'amount.amount'],
+    arguments: ['orderParameterName' => 'sortOrder']
+)]
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
 #[ORM\Table(name: 'transactions')]
 #[ORM\HasLifecycleCallbacks]
-class Transaction
+class Transaction implements UserOwnedInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: 'uuid', unique: true)]
@@ -29,7 +53,7 @@ class Transaction
     #[ORM\JoinColumn(name: 'subcategory_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private Subcategory $subcategory;
 
-    #[ORM\Column(type: 'money', options: ['jsonb' => true])]
+    #[ORM\Column(type: MoneyType::NAME)]
     private Money $amount;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
