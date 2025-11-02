@@ -24,6 +24,10 @@ use Symfony\Component\Uid\Uuid;
 
 #[ApiResource(
     operations: [
+        new Get(
+            security: "is_granted('ROLE_USER')",
+            output: SubcategoryOutput::class
+        ),
         new GetCollection(
             security: "is_granted('ROLE_USER')",
         ),

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Doctrine;
 
 use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
+use ApiPlatform\Doctrine\Orm\Extension\QueryItemExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use App\Entity\Subcategory;
@@ -13,7 +14,8 @@ use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\AsTaggedItem;
 
 #[AsTaggedItem('api_platform.doctrine.orm.query_extension.collection', 10)]
-class CurrentUserExtension implements QueryCollectionExtensionInterface
+#[AsTaggedItem('api_platform.doctrine.orm.query_extension.item', 10)]
+class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryItemExtensionInterface
 {
     public function __construct(
         private Security $security
@@ -27,20 +29,34 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface
         ?Operation $operation = null,
         array $context = []
     ): void {
+        $this->addWhereUser($queryBuilder, $resourceClass);
+    }
+
+    public function applyToItem(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        array $identifiers,
+        ?Operation $operation = null,
+        array $context = []
+    ): void {
+        $this->addWhereUser($queryBuilder, $resourceClass);
+    }
+
+    private function addWhereUser(QueryBuilder $queryBuilder, string $resourceClass): void
+    {
         if ($resourceClass !== Subcategory::class) {
-            return; // Only apply to specific entity
+            return;
         }
 
         $user = $this->security->getUser();
         if (!$user) {
-            return; // No user, no filter applied
+            return;
         }
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        $parameterName = $queryNameGenerator->generateParameterName('user');
-
         $queryBuilder
-            ->andWhere(sprintf('%s.user = :%s', $rootAlias, $parameterName))
-            ->setParameter($parameterName, $user->getId());
+            ->andWhere(sprintf('%s.user = :current_user', $rootAlias))
+            ->setParameter('current_user', $user->getId());
     }
 }

@@ -22,6 +22,12 @@ class SubcategoryRepository extends ServiceEntityRepository
         parent::__construct($registry, Subcategory::class);
     }
 
+    public function save(Subcategory $subcategory): void
+    {
+        $this->getEntityManager()->persist($subcategory);
+        $this->getEntityManager()->flush();
+    }
+
     public function findForUserByUserAndType(User $user, ?TransactionType $type): QueryBuilder
     {
         $qb = $this->createQueryBuilder('s')
