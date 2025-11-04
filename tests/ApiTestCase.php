@@ -57,18 +57,24 @@ abstract class ApiTestCase extends BaseApiTestCase
 
     protected function createSubcategory(User $user, string $name, ?TransactionType $type = TransactionType::EXPENSE, ?MainCategory $mainCategory = MainCategory::FOOD): Subcategory
     {
-        $subcategory = new Subcategory($user, $name, $type, $mainCategory);
-        $this->entityManager()->persist($subcategory);
-        $this->entityManager()->flush();
+        $em = $this->entityManager();
+        /** @var User $managedUser */
+        $managedUser = $em->find(User::class, $user->getId());
+        $subcategory = new Subcategory($managedUser, $name, $type, $mainCategory);
+        $em->persist($subcategory);
+        $em->flush();
 
         return $subcategory;
     }
 
     protected function createBudget(User $user, int $year, int $month, Money $plannedIncome): Budget
     {
-        $budget = new Budget($user, $year, $month, $plannedIncome);
-        $this->entityManager()->persist($budget);
-        $this->entityManager()->flush();
+        $em = $this->entityManager();
+        /** @var User $managedUser */
+        $managedUser = $em->find(User::class, $user->getId());
+        $budget = new Budget($managedUser, $year, $month, $plannedIncome);
+        $em->persist($budget);
+        $em->flush();
 
         return $budget;
     }

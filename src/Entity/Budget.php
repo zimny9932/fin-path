@@ -9,10 +9,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use App\DTO\BudgetInput;
 use App\DTO\BudgetOutput;
+use App\DTO\CopyBudgetInput;
 use App\Model\ValueObject\Money;
 use App\Repository\BudgetRepository;
 use App\State\BudgetProvider;
 use App\State\BudgetProcessor;
+use App\State\CopyBudgetProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -38,6 +40,14 @@ use ApiPlatform\Metadata\ApiResource;
             input: BudgetInput::class,
             output: BudgetOutput::class,
             processor: BudgetProcessor::class
+        ),
+        new Post(
+            uriTemplate: '/budgets/{year}/{month}/copy',
+            requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'],
+            security: "is_granted('ROLE_USER')",
+            input: CopyBudgetInput::class,
+            output: BudgetOutput::class,
+            processor: CopyBudgetProcessor::class,
         ),
     ]
 )]
@@ -128,6 +138,13 @@ class Budget
     public function getBudgetLimits(): Collection
     {
         return $this->budgetLimits;
+    }
+
+    public function addBudgetLimit(BudgetLimit $budgetLimit): void
+    {
+        if (!$this->budgetLimits->contains($budgetLimit)) {
+            $this->budgetLimits->add($budgetLimit);
+        }
     }
 
     public function setYear(int $year): void
