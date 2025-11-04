@@ -7,6 +7,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\DTO\BudgetInput;
 use App\DTO\BudgetOutput;
 use App\DTO\CopyBudgetInput;
@@ -35,11 +36,21 @@ use ApiPlatform\Metadata\ApiResource;
             output: BudgetOutput::class,
             provider: BudgetProvider::class
         ),
+        new Put(
+            uriTemplate: '/budgets/{year}/{month}',
+            requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'],
+            security: "is_granted('ROLE_USER') and object.getUser() == user",
+            input: BudgetInput::class,
+            output: BudgetOutput::class,
+            provider: BudgetProvider::class,
+            processor: BudgetProcessor::class
+        ),
         new Post(
             security: "is_granted('ROLE_USER')",
             input: BudgetInput::class,
             output: BudgetOutput::class,
-            processor: BudgetProcessor::class
+            processor: BudgetProcessor::class,
+            validationContext: ['groups' => ['Default', 'budget:create']]
         ),
         new Post(
             uriTemplate: '/budgets/{year}/{month}/copy',
@@ -157,4 +168,8 @@ class Budget
         $this->month = $month;
     }
 
+    public function setPlannedIncome(Money $plannedIncome): void
+    {
+        $this->plannedIncome = $plannedIncome;
+    }
 }

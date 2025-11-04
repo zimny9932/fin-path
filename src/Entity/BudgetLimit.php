@@ -22,7 +22,7 @@ class BudgetLimit
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private Uuid $id;
     
-    #[ORM\ManyToOne(targetEntity: Budget::class, inversedBy: 'budgetLimits')]
+    #[ORM\ManyToOne(targetEntity: Budget::class, inversedBy: 'budgetLimits', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'budget_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private Budget $budget;
 

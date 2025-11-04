@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\State;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Post;
 use ApiPlatform\State\ProcessorInterface;
 use App\DTO\BudgetInput;
 use App\Entity\Budget;
@@ -41,6 +42,18 @@ final readonly class BudgetProcessor implements ProcessorInterface
         /** @var User $user */
         $user = $this->security->getUser();
 
+        if ($operation instanceof Post && !isset($context['previous_data'])) {
+            return $this->createBudget($data, $user);
+        }
+
+        /** @var Budget $budget */
+        $budget = $context['previous_data'];
+
+        return $this->updateBudget($budget, $data, $user);
+    }
+
+    private function createBudget(BudgetInput $data, User $user): Budget
+    {
         if ($this->budgetRepository->findOneBy(['user' => $user, 'year' => $data->year, 'month' => $data->month])) {
             throw new BudgetAlreadyExistsException();
         }
@@ -58,6 +71,22 @@ final readonly class BudgetProcessor implements ProcessorInterface
         $this->entityManager->flush();
 
         return $budget;
+    }
+
+    private function updateBudget(Budget $budget, BudgetInput $data, User $user): Budget
+    {
+        //Get entity to register it in UOW
+        $budgetEntity = $this->budgetRepository->find($budget->getId());
+        $budgetEntity->setPlannedIncome(
+            Money::fromPrimitives($data->plannedIncome->amount, $data->plannedIncome->currency)
+        );
+
+        $budgetEntity->getBudgetLimits()->clear();
+
+        $this->processLimits($data, $user, $budgetEntity);
+        $this->entityManager->flush();
+
+        return $budgetEntity;
     }
 
     private function processLimits(BudgetInput $data, User $user, Budget $budget): void

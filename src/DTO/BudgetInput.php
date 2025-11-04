@@ -8,11 +8,11 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 final class BudgetInput
 {
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: ['budget:create'])]
     #[Assert\Range(min: 2020, max: 2100)]
     public ?int $year = null;
 
-    #[Assert\NotBlank]
+    #[Assert\NotBlank(groups: ['budget:create'])]
     #[Assert\Range(min: 1, max: 12)]
     public ?int $month = null;
 
