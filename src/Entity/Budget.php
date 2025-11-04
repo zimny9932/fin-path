@@ -5,18 +5,20 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Post;
+use App\DTO\BudgetInput;
 use App\DTO\BudgetOutput;
 use App\Model\ValueObject\Money;
 use App\Repository\BudgetRepository;
 use App\State\BudgetProvider;
+use App\State\BudgetProcessor;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use ApiPlatform\Metadata\ApiResource;
-use ApiPlatform\Metadata\Get;
-use ApiPlatform\Metadata\Link;
 
 #[ORM\Entity(repositoryClass: BudgetRepository::class)]
 #[ORM\Table(name: 'budgets')]
@@ -30,6 +32,12 @@ use ApiPlatform\Metadata\Link;
             security: "is_granted('ROLE_USER')",
             output: BudgetOutput::class,
             provider: BudgetProvider::class
+        ),
+        new Post(
+            security: "is_granted('ROLE_USER')",
+            input: BudgetInput::class,
+            output: BudgetOutput::class,
+            processor: BudgetProcessor::class
         ),
     ]
 )]
