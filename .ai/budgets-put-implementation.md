@@ -94,3 +94,4 @@ Celem tego punktu końcowego jest umożliwienie użytkownikom aktualizacji istni
    - Test próby aktualizacji bez uwierzytelnienia (`401 Unauthorized`).
    - Test próby aktualizacji budżetu innego użytkownika (powinien zwrócić `404 Not Found`).
 5. **Dokumentacja**: Sprawdzić, czy nowy punkt końcowy jest poprawnie udokumentowany w generowanej specyfikacji OpenAPI / Swagger UI.
+

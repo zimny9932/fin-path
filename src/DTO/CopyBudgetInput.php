@@ -15,3 +15,4 @@ final class CopyBudgetInput
     #[Assert\Range(min: 1, max: 12)]
     public int $sourceMonth;
 }
+

@@ -11,4 +11,9 @@ final readonly class MoneyOutput
         public string $currency,
     ) {
     }
+
+    public static function fromMoney(\App\Model\ValueObject\Money $money): self
+    {
+        return new self($money->amount, $money->currency);
+    }
 }

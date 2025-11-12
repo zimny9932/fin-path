@@ -38,4 +38,24 @@ final readonly class Money
     {
         return new self(0, self::DEFAULT_CURRENCY);
     }
+
+    public function add(self $other): self
+    {
+        return new self($this->amount + $other->amount, $this->currency);
+    }
+
+    public function subtract(self $other): self
+    {
+        return new self($this->amount - $other->amount, $this->currency);
+    }
+
+    public function getAmount(): int
+    {
+        return $this->amount;
+    }
+
+    public static function fromMoney(Money $money): self
+    {
+        return new self($money->amount, $money->currency);
+    }
 }
