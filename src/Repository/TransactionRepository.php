@@ -24,6 +24,39 @@ class TransactionRepository extends ServiceEntityRepository
         parent::__construct($registry, Transaction::class);
     }
 
+    /**
+     * @return array<int, array{mainCategory: string, total: int, currency: string}>
+     */
+    public function findSpendingByCategory(User $user, \DateTimeImmutable $startDate, \DateTimeImmutable $endDate): array
+    {
+        $rsm = new ResultSetMapping();
+        $rsm->addScalarResult('main_category', 'mainCategory');
+        $rsm->addScalarResult('total', 'total', 'integer');
+        $rsm->addScalarResult('currency', 'currency');
+
+        $sql = <<<SQL
+SELECT
+    s.main_category,
+    SUM((t.amount->>'amount')::INTEGER) as total,
+    t.amount->>'currency' as currency
+FROM transactions t
+JOIN subcategories s on t.subcategory_id = s.id
+WHERE t.user_id = :userId
+  AND s.type = :type
+  AND t.date BETWEEN :startDate AND :endDate
+GROUP BY s.main_category, currency
+ORDER BY total DESC
+SQL;
+
+        $query = $this->getEntityManager()->createNativeQuery($sql, $rsm);
+        $query->setParameter('userId', $user->getId());
+        $query->setParameter('type', TransactionType::EXPENSE->value);
+        $query->setParameter('startDate', $startDate->format('Y-m-d'));
+        $query->setParameter('endDate', $endDate->format('Y-m-d'));
+
+        return $query->getResult();
+    }
+
     public function hasTransactionsForSubcategory(Subcategory $subcategory): bool
     {
         return $this->count(['subcategory' => $subcategory]) > 0;
@@ -55,8 +88,6 @@ SQL;
         $query->setParameter('userId', $user->getId());
         $query->setParameter('startDate', $startDate->format('Y-m-d'));
         $query->setParameter('endDate', $endDate->format('Y-m-d'));
-//        $query->setParameter('incomeType', TransactionType::INCOME->value);
-//        $query->setParameter('expenseType', TransactionType::EXPENSE->value);
 
         $results = $query->getOneOrNullResult() ?? ['total_income' => 0, 'total_expenses' => 0, 'currency' => 'PLN'];
 
