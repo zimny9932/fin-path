@@ -4,6 +4,19 @@ declare(strict_types=1);
 
 namespace App\Enum;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\GetCollection;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+#[ApiResource(
+    operations: [
+        new GetCollection(
+            uriTemplate: '/enums/main-categories',
+            provider: MainCategory::class . '::getCases',
+        ),
+    ],
+    normalizationContext: ['groups' => ['read']]
+)]
 enum MainCategory: string
 {
     // Expenses
@@ -24,8 +37,26 @@ enum MainCategory: string
     case INVESTMENT_INCOME = 'Investment Income';
     case GIFTS = 'Gifts';
 
+    #[Groups(['read'])]
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    #[Groups(['read'])]
+    public function getValue(): string
+    {
+        return $this->value;
+    }
+
     public static function values(): array
     {
         return array_column(self::cases(), 'value');
     }
+
+    public static function getCases(): array
+    {
+        return self::cases();
+    }
+
 }
