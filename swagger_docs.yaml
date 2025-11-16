@@ -1,0 +1,2324 @@
+openapi: 3.1.0
+info:
+  title: 'Fin-Path API'
+  description: ''
+  version: 1.0.0
+servers:
+  -
+    url: /
+    description: ''
+paths:
+  /api/budgets:
+    post:
+      operationId: api_budgets_post
+      tags:
+        - Budget
+      responses:
+        '201':
+          description: 'Budget resource created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Creates a Budget resource.'
+      description: 'Creates a Budget resource.'
+      parameters: []
+      requestBody:
+        description: 'The new Budget resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget.BudgetInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Budget.BudgetInput'
+        required: true
+  '/api/budgets/{year}/{month}':
+    get:
+      operationId: api_budgets_year_month_get
+      tags:
+        - Budget
+      responses:
+        '200':
+          description: 'Budget resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a Budget resource.'
+      description: 'Retrieves a Budget resource.'
+      parameters:
+        -
+          name: year
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: month
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+    put:
+      operationId: api_budgets_year_month_put
+      tags:
+        - Budget
+      responses:
+        '200':
+          description: 'Budget resource updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Replaces the Budget resource.'
+      description: 'Replaces the Budget resource.'
+      parameters:
+        -
+          name: year
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: month
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      requestBody:
+        description: 'The updated Budget resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget.BudgetInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Budget.BudgetInput'
+        required: true
+  '/api/budgets/{year}/{month}/copy':
+    post:
+      operationId: api_budgets_year_monthcopy_post
+      tags:
+        - Budget
+      responses:
+        '201':
+          description: 'Budget resource created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Budget.BudgetOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Creates a Budget resource.'
+      description: 'Creates a Budget resource.'
+      parameters:
+        -
+          name: year
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+        -
+          name: month
+          in: path
+          description: 'Budget identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      requestBody:
+        description: 'The new Budget resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Budget.CopyBudgetInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Budget.CopyBudgetInput'
+        required: true
+  /api/dashboard:
+    get:
+      operationId: api_dashboard_get
+      tags:
+        - Dashboard
+      responses:
+        '200':
+          description: 'Dashboard resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard.DashboardOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Dashboard.DashboardOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a Dashboard resource.'
+      description: 'Retrieves a Dashboard resource.'
+      parameters: []
+  /api/login:
+    post:
+      operationId: login_check_post
+      tags:
+        - 'Login Check'
+      responses:
+        '200':
+          description: 'User token created'
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token: { readOnly: true, type: string, nullable: false }
+                required:
+                  - token
+      summary: 'Creates a user token.'
+      description: 'Creates a user token.'
+      requestBody:
+        description: 'The login data'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  nullable: false
+                password:
+                  type: string
+                  nullable: false
+              required:
+                - email
+                - password
+        required: true
+  /api/enums/main-categories:
+    get:
+      operationId: api_enumsmain-categories_get_collection
+      tags:
+        - MainCategory
+      responses:
+        '200':
+          description: 'MainCategory collection'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MainCategory-read'
+            application/ld+json:
+              schema:
+                type: object
+                description: 'MainCategory.jsonld-read collection.'
+                allOf:
+                  - { $ref: '#/components/schemas/HydraCollectionBaseSchema' }
+                  - { type: object, required: [member], properties: { member: { type: array, items: { $ref: '#/components/schemas/MainCategory.jsonld-read' } } } }
+      summary: 'Retrieves the collection of MainCategory resources.'
+      description: 'Retrieves the collection of MainCategory resources.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: false
+  /api/reports/spending-by-category:
+    get:
+      operationId: api_reportsspending-by-category_get
+      tags:
+        - SpendingReport
+      responses:
+        '200':
+          description: 'SpendingReport resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpendingReport.SpendingByCategoryOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/SpendingReport.SpendingByCategoryOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a SpendingReport resource.'
+      description: 'Retrieves a SpendingReport resource.'
+      parameters: []
+  /api/recent-subcategories:
+    get:
+      operationId: get_recent_subcategories
+      tags:
+        - Subcategory
+      responses:
+        '200':
+          description: 'Subcategory collection'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subcategory'
+            application/ld+json:
+              schema:
+                type: object
+                description: 'Subcategory.jsonld collection.'
+                allOf:
+                  - { $ref: '#/components/schemas/HydraCollectionBaseSchema' }
+                  - { type: object, required: [member], properties: { member: { type: array, items: { $ref: '#/components/schemas/Subcategory.jsonld' } } } }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves the collection of Subcategory resources.'
+      description: 'Retrieves the collection of Subcategory resources.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: false
+        -
+          name: type
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'type[]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+  /api/subcategories:
+    get:
+      operationId: api_subcategories_get_collection
+      tags:
+        - Subcategory
+      responses:
+        '200':
+          description: 'Subcategory collection'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Subcategory'
+            application/ld+json:
+              schema:
+                type: object
+                description: 'Subcategory.jsonld collection.'
+                allOf:
+                  - { $ref: '#/components/schemas/HydraCollectionBaseSchema' }
+                  - { type: object, required: [member], properties: { member: { type: array, items: { $ref: '#/components/schemas/Subcategory.jsonld' } } } }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves the collection of Subcategory resources.'
+      description: 'Retrieves the collection of Subcategory resources.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: false
+        -
+          name: type
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'type[]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: array
+            items:
+              type: string
+          style: form
+          explode: true
+    post:
+      operationId: api_subcategories_post
+      tags:
+        - Subcategory
+      responses:
+        '201':
+          description: 'Subcategory resource created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Creates a Subcategory resource.'
+      description: 'Creates a Subcategory resource.'
+      parameters: []
+      requestBody:
+        description: 'The new Subcategory resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subcategory.SubcategoryInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Subcategory.SubcategoryInput'
+        required: true
+  '/api/subcategories/{id}':
+    get:
+      operationId: api_subcategories_id_get
+      tags:
+        - Subcategory
+      responses:
+        '200':
+          description: 'Subcategory resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a Subcategory resource.'
+      description: 'Retrieves a Subcategory resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Subcategory identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+    put:
+      operationId: api_subcategories_id_put
+      tags:
+        - Subcategory
+      responses:
+        '200':
+          description: 'Subcategory resource updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Subcategory.SubcategoryOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Replaces the Subcategory resource.'
+      description: 'Replaces the Subcategory resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Subcategory identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      requestBody:
+        description: 'The updated Subcategory resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subcategory.SubcategoryInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Subcategory.SubcategoryInput'
+        required: true
+    delete:
+      operationId: api_subcategories_id_delete
+      tags:
+        - Subcategory
+      responses:
+        '204':
+          description: 'Subcategory resource deleted'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Removes the Subcategory resource.'
+      description: 'Removes the Subcategory resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Subcategory identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+  /api/transactions:
+    get:
+      operationId: api_transactions_get_collection
+      tags:
+        - Transaction
+      responses:
+        '200':
+          description: 'Transaction collection'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+            application/ld+json:
+              schema:
+                type: object
+                description: 'Transaction.jsonld collection.'
+                allOf:
+                  - { $ref: '#/components/schemas/HydraCollectionBaseSchema' }
+                  - { type: object, required: [member], properties: { member: { type: array, items: { $ref: '#/components/schemas/Transaction.jsonld' } } } }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves the collection of Transaction resources.'
+      description: 'Retrieves the collection of Transaction resources.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: false
+        -
+          name: itemsPerPage
+          in: query
+          description: 'The number of items per page'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 30
+            minimum: 0
+            maximum: 30
+          style: form
+          explode: false
+        -
+          name: 'date[before]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'date[strictly_before]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'date[after]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'date[strictly_after]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+          style: form
+          explode: false
+        -
+          name: 'sortOrder[date]'
+          in: query
+          description: ''
+          required: false
+          deprecated: false
+          schema:
+            type: string
+            default: asc
+            enum:
+              - asc
+              - desc
+          style: form
+          explode: false
+    post:
+      operationId: api_transactions_post
+      tags:
+        - Transaction
+      responses:
+        '201':
+          description: 'Transaction resource created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Creates a Transaction resource.'
+      description: 'Creates a Transaction resource.'
+      parameters: []
+      requestBody:
+        description: 'The new Transaction resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction.TransactionInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Transaction.TransactionInput'
+        required: true
+  '/api/transactions/{id}':
+    get:
+      operationId: api_transactions_id_get
+      tags:
+        - Transaction
+      responses:
+        '200':
+          description: 'Transaction resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a Transaction resource.'
+      description: 'Retrieves a Transaction resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Transaction identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+    put:
+      operationId: api_transactions_id_put
+      tags:
+        - Transaction
+      responses:
+        '200':
+          description: 'Transaction resource updated'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Transaction.TransactionOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Replaces the Transaction resource.'
+      description: 'Replaces the Transaction resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Transaction identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+      requestBody:
+        description: 'The updated Transaction resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction.TransactionInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/Transaction.TransactionInput'
+        required: true
+    delete:
+      operationId: api_transactions_id_delete
+      tags:
+        - Transaction
+      responses:
+        '204':
+          description: 'Transaction resource deleted'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Removes the Transaction resource.'
+      description: 'Removes the Transaction resource.'
+      parameters:
+        -
+          name: id
+          in: path
+          description: 'Transaction identifier'
+          required: true
+          deprecated: false
+          schema:
+            type: string
+          style: simple
+          explode: false
+  /api/enums/transaction-types:
+    get:
+      operationId: api_enumstransaction-types_get_collection
+      tags:
+        - TransactionType
+      responses:
+        '200':
+          description: 'TransactionType collection'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TransactionType-read'
+            application/ld+json:
+              schema:
+                type: object
+                description: 'TransactionType.jsonld-read collection.'
+                allOf:
+                  - { $ref: '#/components/schemas/HydraCollectionBaseSchema' }
+                  - { type: object, required: [member], properties: { member: { type: array, items: { $ref: '#/components/schemas/TransactionType.jsonld-read' } } } }
+      summary: 'Retrieves the collection of TransactionType resources.'
+      description: 'Retrieves the collection of TransactionType resources.'
+      parameters:
+        -
+          name: page
+          in: query
+          description: 'The collection page number'
+          required: false
+          deprecated: false
+          schema:
+            type: integer
+            default: 1
+          style: form
+          explode: false
+  /api/register:
+    post:
+      operationId: api_register_post
+      tags:
+        - User
+      responses:
+        '201':
+          description: 'User resource created'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.RegistrationOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/User.RegistrationOutput.jsonld'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConstraintViolation'
+          links: {  }
+      summary: 'Creates a User resource.'
+      description: 'Creates a User resource.'
+      parameters: []
+      requestBody:
+        description: 'The new User resource'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User.RegistrationInput'
+          application/ld+json:
+            schema:
+              $ref: '#/components/schemas/User.RegistrationInput'
+        required: true
+  /api/token/refresh:
+    post:
+      operationId: api_tokenrefresh_post
+      tags:
+        - User
+      responses:
+        '204':
+          description: 'User resource created'
+          links: {  }
+        '400':
+          description: 'Invalid input'
+          links: {  }
+        '422':
+          description: 'An error occurred'
+          links: {  }
+        '403':
+          description: Forbidden
+          links: {  }
+      summary: 'Creates a User resource.'
+      description: 'Creates a User resource.'
+      parameters: []
+  /api/users/me:
+    get:
+      operationId: api_usersme_get
+      tags:
+        - User
+      responses:
+        '200':
+          description: 'User resource'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User.UserOutput'
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/User.UserOutput.jsonld'
+        '403':
+          description: Forbidden
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+        '404':
+          description: 'Not found'
+          content:
+            application/ld+json:
+              schema:
+                $ref: '#/components/schemas/Error.jsonld'
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          links: {  }
+      summary: 'Retrieves a User resource.'
+      description: 'Retrieves a User resource.'
+      parameters: []
+components:
+  schemas:
+    BillingCycleOutput:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+    BillingCycleOutput.jsonld:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+    Budget.BudgetInput:
+      type: object
+      properties:
+        year:
+          minimum: 2020
+          maximum: 2100
+          type:
+            - integer
+            - 'null'
+        month:
+          minimum: 1
+          maximum: 12
+          type:
+            - integer
+            - 'null'
+        plannedIncome:
+          anyOf:
+            -
+              $ref: '#/components/schemas/MoneyInput'
+            -
+              type: 'null'
+        limits:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetLimitInput'
+      required:
+        - plannedIncome
+    Budget.BudgetOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        year:
+          type: integer
+        month:
+          type: integer
+        plannedIncome:
+          $ref: '#/components/schemas/Money'
+        limits:
+          type: array
+          items:
+            $ref: '#/components/schemas/BudgetLimitOutput'
+    Budget.BudgetOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            year:
+              type: integer
+            month:
+              type: integer
+            plannedIncome:
+              $ref: '#/components/schemas/Money.jsonld'
+            limits:
+              type: array
+              items:
+                $ref: '#/components/schemas/BudgetLimitOutput.jsonld'
+    Budget.CopyBudgetInput:
+      type: object
+      required:
+        - sourceYear
+        - sourceMonth
+      properties:
+        sourceYear:
+          type: integer
+        sourceMonth:
+          minimum: 1
+          maximum: 12
+          type: integer
+    BudgetLimitInput:
+      type: object
+      required:
+        - subcategoryId
+        - limitAmount
+      properties:
+        subcategoryId:
+          format: uuid
+          externalDocs:
+            url: 'https://schema.org/identifier'
+          type:
+            - string
+            - 'null'
+        limitAmount:
+          anyOf:
+            -
+              $ref: '#/components/schemas/MoneyInput'
+            -
+              type: 'null'
+    BudgetLimitOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        limitAmount:
+          $ref: '#/components/schemas/Money'
+        subcategory:
+          $ref: '#/components/schemas/SubcategoryNestedOutput'
+    BudgetLimitOutput.jsonld:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        limitAmount:
+          $ref: '#/components/schemas/Money.jsonld'
+        subcategory:
+          $ref: '#/components/schemas/SubcategoryNestedOutput.jsonld'
+    BudgetProgressOutput:
+      type: object
+      properties:
+        planned:
+          $ref: '#/components/schemas/MoneyOutput'
+        spent:
+          $ref: '#/components/schemas/MoneyOutput'
+        percentage:
+          minimum: 0
+          maximum: 100
+          type: integer
+    BudgetProgressOutput.jsonld:
+      type: object
+      properties:
+        planned:
+          $ref: '#/components/schemas/MoneyOutput.jsonld'
+        spent:
+          $ref: '#/components/schemas/MoneyOutput.jsonld'
+        percentage:
+          minimum: 0
+          maximum: 100
+          type: integer
+    ConstraintViolation:
+      type: object
+      description: 'Unprocessable entity'
+      properties:
+        status:
+          default: 422
+          type: integer
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              propertyPath:
+                type: string
+                description: 'The property path of the violation'
+              message:
+                type: string
+                description: 'The message associated with the violation'
+        detail:
+          readOnly: true
+          type: string
+        type:
+          readOnly: true
+          type: string
+        title:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+        instance:
+          readOnly: true
+          type:
+            - string
+            - 'null'
+    ConstraintViolation.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            status:
+              default: 422
+              type: integer
+            violations:
+              type: array
+              items:
+                type: object
+                properties:
+                  propertyPath: { type: string, description: 'The property path of the violation' }
+                  message: { type: string, description: 'The message associated with the violation' }
+            detail:
+              readOnly: true
+              type: string
+            description:
+              readOnly: true
+              type: string
+            type:
+              readOnly: true
+              type: string
+            title:
+              readOnly: true
+              type:
+                - string
+                - 'null'
+            instance:
+              readOnly: true
+              type:
+                - string
+                - 'null'
+      description: 'Unprocessable entity'
+    Dashboard.DashboardOutput:
+      type: object
+      properties:
+        billingCycle:
+          $ref: '#/components/schemas/BillingCycleOutput'
+        summary:
+          $ref: '#/components/schemas/DashboardSummaryOutput'
+        budgetProgress:
+          anyOf:
+            -
+              $ref: '#/components/schemas/BudgetProgressOutput'
+            -
+              type: 'null'
+    Dashboard.DashboardOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            billingCycle:
+              $ref: '#/components/schemas/BillingCycleOutput.jsonld'
+            summary:
+              $ref: '#/components/schemas/DashboardSummaryOutput.jsonld'
+            budgetProgress:
+              anyOf:
+                -
+                  $ref: '#/components/schemas/BudgetProgressOutput.jsonld'
+                -
+                  type: 'null'
+    DashboardSummaryOutput:
+      type: object
+      properties:
+        totalIncome:
+          $ref: '#/components/schemas/MoneyOutput'
+        totalExpenses:
+          $ref: '#/components/schemas/MoneyOutput'
+        balance:
+          $ref: '#/components/schemas/MoneyOutput'
+    DashboardSummaryOutput.jsonld:
+      type: object
+      properties:
+        totalIncome:
+          $ref: '#/components/schemas/MoneyOutput.jsonld'
+        totalExpenses:
+          $ref: '#/components/schemas/MoneyOutput.jsonld'
+        balance:
+          $ref: '#/components/schemas/MoneyOutput.jsonld'
+    Error:
+      type: object
+      description: 'A representation of common errors.'
+      properties:
+        title:
+          readOnly: true
+          description: 'A short, human-readable summary of the problem.'
+          type: string
+        detail:
+          readOnly: true
+          description: 'A human-readable explanation specific to this occurrence of the problem.'
+          type: string
+        status:
+          type: number
+          examples:
+            - 404
+          default: 400
+        instance:
+          readOnly: true
+          description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.'
+          type:
+            - string
+            - 'null'
+        type:
+          readOnly: true
+          description: 'A URI reference that identifies the problem type'
+          type: string
+    Error.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            title:
+              readOnly: true
+              description: 'A short, human-readable summary of the problem.'
+              type: string
+            detail:
+              readOnly: true
+              description: 'A human-readable explanation specific to this occurrence of the problem.'
+              type: string
+            status:
+              type: number
+              examples:
+                - 404
+              default: 400
+            instance:
+              readOnly: true
+              description: 'A URI reference that identifies the specific occurrence of the problem. It may or may not yield further information if dereferenced.'
+              type:
+                - string
+                - 'null'
+            type:
+              readOnly: true
+              description: 'A URI reference that identifies the problem type'
+              type: string
+            description:
+              readOnly: true
+              type:
+                - string
+                - 'null'
+      description: 'A representation of common errors.'
+    HydraCollectionBaseSchema:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          minimum: 0
+        view:
+          type: object
+          properties:
+            '@id':
+              type: string
+              format: iri-reference
+            '@type':
+              type: string
+            first:
+              type: string
+              format: iri-reference
+            last:
+              type: string
+              format: iri-reference
+            previous:
+              type: string
+              format: iri-reference
+            next:
+              type: string
+              format: iri-reference
+          example:
+            '@id': string
+            type: string
+            first: string
+            last: string
+            previous: string
+            next: string
+        search:
+          type: object
+          properties:
+            '@type':
+              type: string
+            template:
+              type: string
+            variableRepresentation:
+              type: string
+            mapping:
+              type: array
+              items:
+                type: object
+                properties:
+                  '@type': { type: string }
+                  variable: { type: string }
+                  property: { type: [string, 'null'] }
+                  required: { type: boolean }
+    HydraItemBaseSchema:
+      type: object
+      properties:
+        '@context':
+          oneOf:
+            -
+              type: string
+            -
+              type: object
+              properties:
+                '@vocab':
+                  type: string
+                hydra:
+                  type: string
+                  enum: ['http://www.w3.org/ns/hydra/core#']
+              required:
+                - '@vocab'
+                - hydra
+              additionalProperties: true
+        '@id':
+          type: string
+        '@type':
+          type: string
+      required:
+        - '@id'
+        - '@type'
+    MainCategory-read:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+        value:
+          readOnly: true
+          type: string
+    MainCategory.jsonld-read:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            name:
+              readOnly: true
+              type: string
+            value:
+              readOnly: true
+              type: string
+    Money:
+      type: object
+      properties:
+        amount:
+          readOnly: true
+          type: integer
+        currency:
+          readOnly: true
+          type: string
+    Money.jsonld:
+      type: object
+      properties:
+        amount:
+          readOnly: true
+          type: integer
+        currency:
+          readOnly: true
+          type: string
+    MoneyInput:
+      type: object
+      required:
+        - amount
+        - currency
+      properties:
+        amount:
+          minimum: 0
+          exclusiveMinimum: 0
+          type:
+            - integer
+            - 'null'
+        currency:
+          externalDocs:
+            url: 'https://schema.org/priceCurrency'
+          type:
+            - string
+            - 'null'
+    MoneyOutput:
+      type: object
+      properties:
+        amount:
+          type: integer
+        currency:
+          type: string
+    MoneyOutput.jsonld:
+      type: object
+      properties:
+        amount:
+          type: integer
+        currency:
+          type: string
+    SpendingReport.SpendingByCategoryOutput:
+      type: object
+      properties:
+        mainCategory:
+          type: string
+        totalAmount:
+          $ref: '#/components/schemas/MoneyOutput'
+        percentageOfTotal:
+          type: number
+    SpendingReport.SpendingByCategoryOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            mainCategory:
+              type: string
+            totalAmount:
+              $ref: '#/components/schemas/MoneyOutput.jsonld'
+            percentageOfTotal:
+              type: number
+    Subcategory:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        user:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        name:
+          type: string
+        type:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        mainCategory:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+    Subcategory.SubcategoryInput:
+      type: object
+      required:
+        - name
+        - type
+        - mainCategory
+      properties:
+        name:
+          minLength: 2
+          maxLength: 100
+          type: string
+        type:
+          enum:
+            - income
+            - expense
+          type: string
+        mainCategory:
+          enum:
+            - Food
+            - Transport
+            - Housing
+            - Healthcare
+            - 'Personal Spending'
+            - Entertainment
+            - Obligations
+            - 'Savings and Investments'
+            - Other
+            - Salary
+            - Business
+            - 'Investment Income'
+            - Gifts
+          type: string
+    Subcategory.SubcategoryOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        mainCategory:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+    Subcategory.SubcategoryOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            type:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+            mainCategory:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+    Subcategory.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              readOnly: true
+              type: string
+              format: uuid
+            user:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+            name:
+              type: string
+            type:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+            mainCategory:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+    SubcategoryNestedOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        mainCategory:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        type:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+    SubcategoryNestedOutput.jsonld:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        mainCategory:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        type:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+    Transaction:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          format: uuid
+        user:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        subcategory:
+          type: string
+          format: iri-reference
+          example: 'https://example.com/'
+        amount:
+          $ref: '#/components/schemas/Money'
+        date:
+          type: string
+          format: date-time
+        description:
+          type:
+            - string
+            - 'null'
+    Transaction.TransactionInput:
+      type: object
+      required:
+        - subcategoryId
+        - amount
+        - date
+      properties:
+        subcategoryId:
+          format: uuid
+          externalDocs:
+            url: 'https://schema.org/identifier'
+          type:
+            - string
+            - 'null'
+        amount:
+          anyOf:
+            -
+              $ref: '#/components/schemas/MoneyInput'
+            -
+              type: 'null'
+        date:
+          externalDocs:
+            url: 'https://schema.org/Date'
+          type:
+            - string
+            - 'null'
+        description:
+          maxLength: 200
+          type:
+            - string
+            - 'null'
+    Transaction.TransactionOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          $ref: '#/components/schemas/MoneyOutput'
+        date:
+          type: string
+          format: date-time
+        description:
+          type:
+            - string
+            - 'null'
+        subcategory:
+          $ref: '#/components/schemas/SubcategoryNestedOutput'
+    Transaction.TransactionOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            amount:
+              $ref: '#/components/schemas/MoneyOutput.jsonld'
+            date:
+              type: string
+              format: date-time
+            description:
+              type:
+                - string
+                - 'null'
+            subcategory:
+              $ref: '#/components/schemas/SubcategoryNestedOutput.jsonld'
+    Transaction.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              readOnly: true
+              type: string
+              format: uuid
+            user:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+            subcategory:
+              type: string
+              format: iri-reference
+              example: 'https://example.com/'
+            amount:
+              $ref: '#/components/schemas/Money.jsonld'
+            date:
+              type: string
+              format: date-time
+            description:
+              type:
+                - string
+                - 'null'
+    TransactionType-read:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+        value:
+          readOnly: true
+          type: string
+    TransactionType.jsonld-read:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            name:
+              readOnly: true
+              type: string
+            value:
+              readOnly: true
+              type: string
+    User.RegistrationInput:
+      type: object
+      required:
+        - email
+        - password
+        - passwordConfirmation
+      properties:
+        email:
+          format: email
+          externalDocs:
+            url: 'https://schema.org/email'
+          type: string
+        password:
+          minLength: 8
+          type: string
+        passwordConfirmation:
+          type: string
+    User.RegistrationOutput:
+      type: object
+      properties:
+        token:
+          type: string
+        refreshToken:
+          type: string
+    User.RegistrationOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            token:
+              type: string
+            refreshToken:
+              type: string
+    User.UserOutput:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        billingCycleStartDay:
+          type:
+            - integer
+            - 'null'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    User.UserOutput.jsonld:
+      allOf:
+        -
+          $ref: '#/components/schemas/HydraItemBaseSchema'
+        -
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            email:
+              type: string
+            billingCycleStartDay:
+              type:
+                - integer
+                - 'null'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+  responses: {  }
+  parameters: {  }
+  examples: {  }
+  requestBodies: {  }
+  headers: {  }
+  securitySchemes:
+    JWT:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  -
+    JWT: []
+tags:
+  -
+    name: Budget
+    description: "Resource 'Budget' operations."
+  -
+    name: Subcategory
+    description: "Resource 'Subcategory' operations."
+  -
+    name: Transaction
+    description: "Resource 'Transaction' operations."
+  -
+    name: User
+    description: "Resource 'User' operations."
+  -
+    name: MainCategory
+    description: "Resource 'MainCategory' operations."
+  -
+    name: TransactionType
+    description: "Resource 'TransactionType' operations."
+  -
+    name: Dashboard
+    description: "Resource 'Dashboard' operations."
+  -
+    name: SpendingReport
+    description: "Resource 'SpendingReport' operations."
+webhooks: {  }

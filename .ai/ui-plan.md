@@ -115,3 +115,4 @@ Poniżej znajduje się lista kluczowych, reużywalnych komponentów, które będ
 - **`EmptyState`:** Komponent wyświetlany, gdy brakuje danych do pokazania w danym widoku (np. brak transakcji, brak danych do raportu).
 - **`Toast`:** Komponent do wyświetlania krótkich, nieinwazyjnych powiadomień o sukcesie operacji (np. "Transakcja dodana pomyślnie") lub błędach.
 - **`Banner`:** Komponent używany do wyświetlania ważnych, kontekstowych komunikatów i wezwań do działania (np. na pulpicie, gdy nie ma zdefiniowanego budżetu).
+
