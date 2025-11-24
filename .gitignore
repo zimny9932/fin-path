@@ -11,6 +11,7 @@
 
 ./docker-compose.yml
 ./.idea
+/.idea
 ./frontend/node_modules/
 ./frontend/.astro/
 ./frontend/.env
@@ -23,4 +24,5 @@
 ###> phpunit/phpunit ###
 /phpunit.xml
 /.phpunit.cache/
+/.phpunit.result.cache
 ###< phpunit/phpunit ###

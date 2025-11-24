@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import RegistrationForm from "../components/RegistrationForm";
+---
+
+<Layout title="Stwórz konto">
+  <main class="flex min-h-screen items-center justify-center">
+    <RegistrationForm client:load />
+  </main>
+</Layout>

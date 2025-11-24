@@ -1,15 +1,16 @@
 ---
 import "../styles/global.css";
+import { Toaster } from "@/components/ui/sonner";
 
 interface Props {
-  title?: string;
+  title: string;
 }
 
-const { title = "10x Astro Starter" } = Astro.props;
+const { title = "FinPath" } = Astro.props;
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="pl" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
@@ -17,16 +18,19 @@ const { title = "10x Astro Starter" } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body>
+  <body class="min-h-screen bg-background font-sans antialiased">
     <slot />
+    <Toaster richColors />
   </body>
 </html>
 
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
+<style is:global>
+  html {
     height: 100%;
+    margin: 0;
+  }
+  body {
+    min-height: 100%;
+    margin: 0;
   }
 </style>

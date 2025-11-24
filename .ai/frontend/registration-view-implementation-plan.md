@@ -170,3 +170,5 @@ Jeśli walidacja nie powiedzie się, formularz nie zostanie wysłany, a odpowied
     -   Zaimplementować wyświetlanie powiadomień Toast dla sukcesu i porażki.
     -   Upewnić się, że wszystkie komunikaty o błędach są poprawnie wyświetlane w interfejsie użytkownika.
 8.  **Stylowanie**: Dopracować wygląd formularza i komunikatów o błędach przy użyciu Tailwind CSS, zgodnie z systemem designu aplikacji.
+
+
