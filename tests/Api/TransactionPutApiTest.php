@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Api;
 
-use App\Entity\Subcategory;
-use App\Entity\Transaction;
-use App\Entity\User;
 use App\Enum\MainCategory;
 use App\Enum\TransactionType;
 use App\Model\ValueObject\Money;

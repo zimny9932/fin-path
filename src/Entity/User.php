@@ -6,15 +6,19 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model;
+use App\DTO\OnboardingInput;
 use App\DTO\RegistrationInput;
 use App\DTO\RegistrationOutput;
 use App\DTO\UserOutput;
+use App\Exception\OnboardingAlreadyCompletedException;
 use App\Exception\UserAlreadyExistsException;
 use App\Repository\UserRepository;
 use App\Service\UserRegistrationProcessor;
 use App\State\MeProvider;
+use App\State\OnboardingProcessor;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -29,6 +33,15 @@ use Symfony\Component\Uid\Uuid;
             provider: MeProvider::class,
             output: UserOutput::class,
             security: "is_granted('ROLE_USER')",
+        ),
+        new Patch(
+            uriTemplate: '/users/me/onboarding',
+            security: "is_granted('ROLE_USER')",
+            input: OnboardingInput::class,
+            output: UserOutput::class,
+            processor: OnboardingProcessor::class,
+            exceptionToStatus: [OnboardingAlreadyCompletedException::class => 400],
+            inputFormats: ['json' => ['application/json']],
         ),
         new Post(
             uriTemplate: '/register',

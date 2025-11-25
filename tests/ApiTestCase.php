@@ -23,9 +23,12 @@ abstract class ApiTestCase extends BaseApiTestCase
         return self::getContainer()->get('doctrine')->getManager();
     }
 
-    protected function createUser(string $email, string $password): User
+    protected function createUser(string $email, string $password, ?int $billingCycleStartDay = null): User
     {
         $user = new User($email, '');
+        if (null !== $billingCycleStartDay){
+            $user->setBillingCycleStartDay($billingCycleStartDay);
+        }
         $hashedPassword = self::getContainer()->get('security.password_hasher')->hashPassword($user, $password);
         $user->setPasswordHash($hashedPassword);
 
