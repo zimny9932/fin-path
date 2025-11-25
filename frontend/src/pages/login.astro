@@ -1,0 +1,14 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import LoginForm from "@/components/LoginForm";
+---
+
+<Layout title="Logowanie - FinPath">
+  <main
+    class="flex-grow-1 flex h-screen flex-col items-center justify-center p-4"
+  >
+    <div class="w-full max-w-md">
+      <LoginForm client:load />
+    </div>
+  </main>
+</Layout>
