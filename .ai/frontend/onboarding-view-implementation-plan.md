@@ -132,3 +132,5 @@ Integracja z API będzie realizowana poprzez wywołanie endpointu `PATCH /api/us
 6.  Zaimplementowanie logiki przekierowania po pomyślnym zapisaniu danych (do `/budget/new`).
 7.  Sprawdzenie i ewentualne dostosowanie routingu/middleware, aby upewnić się, że strona jest dostępna tylko dla nowych użytkowników.
 8.  Ręczne przetestowanie wszystkich ścieżek interakcji użytkownika, w tym przypadków błędów.
+
+

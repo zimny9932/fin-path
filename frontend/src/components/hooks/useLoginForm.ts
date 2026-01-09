@@ -5,8 +5,9 @@ import type {
     LoginFormViewModel,
     LoginFormValidationViewModel,
     LoginRequestDTO,
-    LoginResponseDTO,
+    RegistrationResponseDto,
 } from "@/types";
+import { saveTokens } from "@/lib/auth";
 
 const loginSchema = z.object({
   email: z
@@ -75,10 +76,9 @@ export const useLoginForm = () => {
         return;
       }
 
-      const data: LoginResponseDTO = await response.json();
+      const data: RegistrationResponseDto = await response.json();
 
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("refresh_token", data.refresh_token);
+      saveTokens(data);
 
       toast.success("Zalogowano pomyślnie!");
       window.location.href = "/";

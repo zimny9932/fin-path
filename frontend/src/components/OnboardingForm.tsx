@@ -1,5 +1,3 @@
-import { useState } from "react";
-import type { OnboardingFormViewModel, OnboardingRequestDTO } from "@/types";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -8,13 +6,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { apiFetch } from "@/lib/api";
+import type { OnboardingFormViewModel } from "@/types";
+import { useState } from "react";
 
-export default function OnboardingForm() {
+const OnboardingForm = () => {
   const [viewModel, setViewModel] = useState<OnboardingFormViewModel>({
     selectedDay: null,
     isLoading: false,
     error: null,
   });
+
+  const days = Array.from({ length: 31 }, (_, i) => i + 1);
+
+  const handleDayChange = (value: string) => {
+    setViewModel((prev) => ({
+      ...prev,
+      selectedDay: parseInt(value, 10),
+      error: null,
+    }));
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,76 +37,84 @@ export default function OnboardingForm() {
     setViewModel((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const body: OnboardingRequestDTO = {
-        billingCycleStartDay: viewModel.selectedDay,
-      };
-
-      const response = await fetch("/api/users/me/onboarding", {
+      await apiFetch("/api/users/me/onboarding", {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
+        body: JSON.stringify({
+          billingCycleStartDay: viewModel.selectedDay,
+        }),
       });
 
-      if (response.ok) {
-        window.location.href = "/budget/new";
-      } else {
-        const errorData = await response.json();
+      window.location.href = "/budget/new";
+    } catch (error: any) {
+      if (error.status === 401) {
+        // Potencjalnie przekierowanie na stronę logowania
         setViewModel((prev) => ({
           ...prev,
-          isLoading: false,
+          error: "Sesja wygasła. Zaloguj się ponownie.",
+        }));
+      } else {
+        setViewModel((prev) => ({
+          ...prev,
           error:
-            errorData.message ||
-            "An unexpected error occurred. Please try again.",
+            error.message ||
+            "Wystąpił błąd. Spróbuj ponownie.",
         }));
       }
-    } catch (error) {
-      setViewModel((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: "A network error occurred. Please check your connection.",
-      }));
+    } finally {
+      setViewModel((prev) => ({ ...prev, isLoading: false }));
     }
   };
 
-  const handleDayChange = (value: string) => {
-    setViewModel((prev) => ({
-      ...prev,
-      selectedDay: Number(value),
-      error: null,
-    }));
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <label htmlFor="billing-day-select" className="text-sm font-medium">
-          Billing cycle start day
-        </label>
-        <Select onValueChange={handleDayChange}>
-          <SelectTrigger id="billing-day-select">
-            <SelectValue placeholder="Select a day" />
-          </SelectTrigger>
-          <SelectContent>
-            {Array.from({ length: 31 }, (_, i) => (
-              <SelectItem key={i + 1} value={String(i + 1)}>
-                {i + 1}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h1 className="text-3xl font-bold">Konfiguracja konta</h1>
+        <p className="text-muted-foreground mt-2">
+          Wybierz dzień, w którym rozpoczyna się Twój miesięczny cykl
+          rozliczeniowy. To pomoże nam dokładnie śledzić Twoje finanse.
+        </p>
       </div>
-      <Button
-        type="submit"
-        className="w-full"
-        disabled={!viewModel.selectedDay || viewModel.isLoading}
-      >
-        {viewModel.isLoading ? "Saving..." : "Save"}
-      </Button>
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label
+            htmlFor="billing-day"
+            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
+            Dzień rozpoczęcia cyklu
+          </label>
+          <Select
+            onValueChange={handleDayChange}
+            value={viewModel.selectedDay?.toString() ?? ""}
+            disabled={viewModel.isLoading}
+          >
+            <SelectTrigger id="billing-day" data-testid="billing-day">
+              <SelectValue placeholder="Wybierz dzień..." />
+            </SelectTrigger>
+            <SelectContent>
+              {days.map((day) => (
+                <SelectItem key={day} value={day.toString()} data-testid={`billing-day-${day.toString()}`}>
+                  {day}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          type="submit"
+          className="w-full"
+          disabled={!viewModel.selectedDay || viewModel.isLoading}
+        >
+          {viewModel.isLoading ? "Zapisywanie..." : "Zapisz i kontynuuj"}
+        </Button>
+      </form>
+
       {viewModel.error && (
-        <p className="text-sm text-center text-red-500">{viewModel.error}</p>
+        <p className="text-sm text-red-500 text-center">{viewModel.error}</p>
       )}
-    </form>
+    </div>
   );
-}
+};
+
+export default OnboardingForm;
