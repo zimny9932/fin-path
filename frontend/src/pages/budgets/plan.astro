@@ -1,0 +1,11 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import BudgetForm from "@/components/BudgetForm";
+---
+
+<Layout title="Planowanie Budżetu">
+  <div class="container mx-auto py-10">
+    <h1 class="text-3xl font-bold mb-6">Planowanie Budżetu</h1>
+    <BudgetForm client:load />
+  </div>
+</Layout>

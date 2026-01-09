@@ -42,7 +42,7 @@ final readonly class BudgetProvider implements ProviderInterface
             throw new NotFoundHttpException('User not found');
         }
 
-        $budget = $this->budgetRepository->findWithRelations($user, $year, $month);
+        $budget = $this->budgetRepository->findWithRelations($user, (int)$year, (int)$month);
 
         if (!$budget) {
             throw new NotFoundHttpException('Budget not found');

@@ -65,4 +65,67 @@ export interface OnboardingFormViewModel {
   error: string | null;
 }
 
+// Budget Planning DTOs and ViewModels
 
+export interface MoneyDTO {
+  amount: number; // kwota w groszach/centach
+  currency: string; // np. "PLN"
+}
+
+export interface MainCategoryDTO {
+  name: string;
+  value: string;
+}
+
+export interface SubcategoryDTO {
+  id: string;
+  name: string;
+  type: 'income' | 'expense';
+  mainCategory: string; // np. "FOOD"
+}
+
+export interface BudgetLimitInputDTO {
+  subcategoryId: string;
+  limitAmount: MoneyDTO;
+}
+
+export interface BudgetInputDTO {
+  year: number;
+  month: number;
+  plannedIncome: MoneyDTO;
+  limits: BudgetLimitInputDTO[];
+}
+
+export interface BudgetLimitResponseDTO {
+    id: string;
+    limitAmount: MoneyDTO;
+    subcategory: {
+        id: string;
+        name: string;
+    };
+}
+
+export interface BudgetResponseDTO {
+  id: string;
+  year: number;
+  month: number;
+  plannedIncome: MoneyDTO;
+  limits: BudgetLimitResponseDTO[];
+}
+
+// ViewModels
+export interface BudgetLimitViewModel {
+  subcategoryId: string;
+  subcategoryName: string;
+  mainCategory: string;
+  limitAmount: number; // kwota w groszach/centach
+}
+
+export interface BudgetViewModel {
+  id: string | null;
+  year: number;
+  month: number;
+  plannedIncome: number; // kwota w groszach/centach
+  limits: BudgetLimitViewModel[];
+  currency: string;
+}

@@ -44,7 +44,7 @@ const OnboardingForm = () => {
         }),
       });
 
-      window.location.href = "/budget/new";
+      window.location.href = "/budgets/plan";
     } catch (error: any) {
       if (error.status === 401) {
         // Potencjalnie przekierowanie na stronę logowania
