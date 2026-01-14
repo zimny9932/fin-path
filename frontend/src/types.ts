@@ -129,3 +129,74 @@ export interface BudgetViewModel {
   limits: BudgetLimitViewModel[];
   currency: string;
 }
+
+// Transactions
+export type MoneyAmount = {
+  amount: number;
+  currency: 'PLN';
+};
+
+export interface SubcategoryNestedDTO {
+  id: string;
+  name: string;
+  mainCategory: string;
+  type: 'income' | 'expense';
+}
+
+export interface TransactionDTO {
+  id: string;
+  amount: MoneyAmount;
+  date: string; // YYYY-MM-DD
+  description?: string | null;
+  subcategory: SubcategoryNestedDTO;
+}
+
+export interface PaginationDTO {
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+}
+
+export interface TransactionsResponse {
+  items: TransactionDTO[];
+  pagination: PaginationDTO;
+}
+
+export type TransactionFilters = {
+  page: number;
+  limit: number;
+  sortBy: 'date' | 'amount';
+  sortOrder: 'asc' | 'desc';
+  startDate?: string;
+  endDate?: string;
+};
+
+export type CycleRange = {
+  label: string;
+  startDate: string;
+  endDate: string;
+};
+
+export type TransactionRowVM = {
+  id: string;
+  date: string;
+  formattedDate: string;
+  amount: MoneyAmount;
+  formattedAmount: string;
+  subcategoryName: string;
+  description?: string | null;
+};
+
+export type TransactionFormData = {
+  amount: number;
+  currency: 'PLN';
+  subcategoryId: string;
+  date: string;
+  description?: string;
+  type: 'income' | 'expense';
+};
+
+export type ErrorShape = {
+  message: string;
+  fieldErrors?: Record<string, string>;
+};

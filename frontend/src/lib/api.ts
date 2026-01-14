@@ -10,10 +10,14 @@ export const apiFetch = async (
   options: ApiFetchOptions = {},
 ) => {
   const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    Accept: "application/json",
+    Accept: "application/ld+json",
     ...options.headers,
   };
+
+  const hasBody = options.body !== undefined;
+  if (hasBody) {
+    headers["Content-Type"] = headers["Content-Type"] ?? "application/json";
+  }
 
   const { needsAuth = true } = options;
 

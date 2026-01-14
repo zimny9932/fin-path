@@ -26,14 +26,17 @@ export const useBudgetForm = (year: number, month: number) => {
 
         setMainCategories(mainCats);
 
+        const subcategoriesArray = Array.isArray(subCats) ? subCats : [];
+
         let initialLimits;
         if (budgetData) { // Budżet istnieje, mapujemy jego limity
-            const existingLimitsMap = new Map<string, BudgetLimitResponseDTO>(
-                budgetData.limits.map((limit: BudgetLimitResponseDTO) => [limit.subcategory.id, limit])
-            );
+            const existingLimits = Array.isArray(budgetData.budgetLimits) ? budgetData.budgetLimits : [];
+            
+            initialLimits = subcategoriesArray.map((sub: SubcategoryDTO) => {
+                const existingLimit = existingLimits.find(
+                    (limit: BudgetLimitResponseDTO) => limit.subcategory.id === sub.id
+                );
 
-            initialLimits = subCats.map((sub: SubcategoryDTO) => {
-                const existingLimit = existingLimitsMap.get(sub.id);
                 return {
                     subcategoryId: sub.id,
                     subcategoryName: sub.name,
@@ -42,7 +45,7 @@ export const useBudgetForm = (year: number, month: number) => {
                 };
             });
         } else { // Budżet nie istnieje, tworzymy puste limity
-             initialLimits = subCats.map((sub: SubcategoryDTO) => ({
+             initialLimits = subcategoriesArray.map((sub: SubcategoryDTO) => ({
                 subcategoryId: sub.id,
                 subcategoryName: sub.name,
                 mainCategory: sub.mainCategory,
@@ -83,10 +86,10 @@ export const useBudgetForm = (year: number, month: number) => {
     });
   };
 
-  const groupedLimits = useMemo(() =>
+  const groupedLimits = useMemo(() => 
     mainCategories.map(mainCat => ({
       ...mainCat,
-      limits: budget?.limits.filter(limit => limit.mainCategory === mainCat.name) || [],
+      limits: budget?.limits.filter(limit => limit.mainCategory.toUpperCase() === mainCat.name.toUpperCase()) || [],
   })), [mainCategories, budget?.limits]);
 
   const totalLimits = budget?.limits.reduce((sum, limit) => sum + limit.limitAmount, 0) || 0;

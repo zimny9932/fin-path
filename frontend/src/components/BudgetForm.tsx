@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useBudgetForm } from './hooks/useBudgetForm';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,6 +6,8 @@ import CurrencyInput from "@/components/ui/CurrencyInput";
 import BudgetCategoryList from "@/components/BudgetCategoryList";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAuthToken } from '@/lib/auth';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertTriangle } from 'lucide-react';
 
 const BudgetForm = () => {
   useEffect(() => {
@@ -32,6 +34,11 @@ const BudgetForm = () => {
     error,
   } = useBudgetForm(year, month);
   
+  const hasOverspending = useMemo(() => {
+    if (!budget) return false;
+    return totalLimits > budget.plannedIncome;
+  }, [totalLimits, budget?.plannedIncome]);
+
   if (error) {
     return (
         <Card>
@@ -104,6 +111,16 @@ const BudgetForm = () => {
         <div className="text-right font-semibold">
             Suma limitów: {(totalLimits / 100).toFixed(2)} {budget.currency}
         </div>
+
+        {hasOverspending && (
+            <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Ostrzeżenie</AlertTitle>
+                <AlertDescription>
+                    Suma planowanych wydatków przekracza Twoje planowane przychody.
+                </AlertDescription>
+            </Alert>
+        )}
 
       </CardContent>
       <CardFooter className="flex justify-between">

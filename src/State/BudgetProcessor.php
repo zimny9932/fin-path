@@ -81,7 +81,15 @@ final readonly class BudgetProcessor implements ProcessorInterface
             Money::fromPrimitives($data->plannedIncome->amount, $data->plannedIncome->currency)
         );
 
+        // Explicitly remove old limits to avoid unique constraint violation
+        foreach ($budgetEntity->getBudgetLimits() as $limit) {
+            $this->entityManager->remove($limit);
+        }
+        // Clear the collection itself
         $budgetEntity->getBudgetLimits()->clear();
+        
+        // Flush deletions before adding new limits
+        $this->entityManager->flush();
 
         $this->processLimits($data, $user, $budgetEntity);
         $this->entityManager->flush();

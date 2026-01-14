@@ -10,7 +10,7 @@ final class MoneyInput
 {
     #[Assert\NotBlank]
     #[Assert\Type('integer')]
-    #[Assert\Positive]
+    #[Assert\PositiveOrZero]
     public ?int $amount = null;
 
     #[Assert\NotBlank]
