@@ -22,6 +22,8 @@ const mapTransaction = (dto: TransactionDTO): TransactionRowVM => ({
   formattedDate: new Date(dto.date).toLocaleDateString('pl-PL'),
   amount: dto.amount,
   formattedAmount: formatAmount(dto.amount.amount, dto.amount.currency),
+  subcategoryId: dto.subcategory.id,
+  type: dto.subcategory.type,
   subcategoryName: dto.subcategory.name,
   description: dto.description ?? null,
 });

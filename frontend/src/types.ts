@@ -67,10 +67,43 @@ export interface OnboardingFormViewModel {
 
 // Budget Planning DTOs and ViewModels
 
+export type CurrencyCode = 'PLN' | (string & {});
+
 export interface MoneyDTO {
   amount: number; // kwota w groszach/centach
-  currency: string; // np. "PLN"
+  currency: CurrencyCode; // np. "PLN"
 }
+
+export type Range = {
+  startDate?: string;
+  endDate?: string;
+};
+
+export type SpendingCategoryReportDTO = {
+  mainCategory: string;
+  totalAmount: MoneyDTO;
+  percentageOfTotal: number;
+};
+
+export type ReportsViewModel = {
+  range: Range;
+  items: SpendingCategoryReportDTO[];
+  totalSpent: MoneyDTO;
+  hasData: boolean;
+};
+
+export type ChartDatum = {
+  label: string;
+  value: number;
+  percentage: number;
+};
+
+export type TableRow = {
+  category: string;
+  amount: number;
+  currency: CurrencyCode;
+  percentage: number;
+};
 
 export interface MainCategoryDTO {
   name: string;
@@ -183,6 +216,8 @@ export type TransactionRowVM = {
   formattedDate: string;
   amount: MoneyAmount;
   formattedAmount: string;
+  subcategoryId: string;
+  type: 'income' | 'expense';
   subcategoryName: string;
   description?: string | null;
 };
@@ -195,6 +230,15 @@ export type TransactionFormData = {
   description?: string;
   type: 'income' | 'expense';
 };
+
+export type TransactionUpdateDTO = Partial<{
+  amount: number;
+  currency: 'PLN';
+  subcategoryId: string;
+  date: string;
+  description?: string;
+  type: 'income' | 'expense';
+}>;
 
 export type ErrorShape = {
   message: string;

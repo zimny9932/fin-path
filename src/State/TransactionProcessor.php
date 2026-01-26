@@ -41,10 +41,13 @@ final class TransactionProcessor implements ProcessorInterface
         }
 
         if ($operation instanceof Put) {
-            /** @var Transaction $transaction */
-            $transaction = $context['previous_data'];
+            $previous = $context['previous_data'] ?? null;
 
-            return $this->updateTransaction($transaction, $data, $subcategory);
+            if (!$previous instanceof Transaction) {
+                throw new NotFoundHttpException('Transaction not found');
+            }
+
+            return $this->updateTransaction($previous, $data, $subcategory);
         }
 
         throw new \LogicException('This processor does not support the given operation.');
@@ -71,6 +74,7 @@ final class TransactionProcessor implements ProcessorInterface
 
     private function updateTransaction(Transaction $transaction, TransactionInput $data, Subcategory $subcategory): Transaction
     {
+        $transaction = $this->entityManager->getRepository(Transaction::class)->find($transaction->getId());
         $money = Money::fromPrimitives($data->amount->amount, $data->amount->currency);
         $date = new \DateTimeImmutable($data->date);
 

@@ -58,6 +58,6 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
         $rootAlias = $queryBuilder->getRootAliases()[0];
         $queryBuilder
             ->andWhere(sprintf('%s.user = :current_user', $rootAlias))
-            ->setParameter('current_user', $user->getId());
+            ->setParameter('current_user', $user);
     }
 }

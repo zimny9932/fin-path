@@ -1,8 +1,17 @@
 ---
 import Welcome from "../components/Welcome.astro";
 import Layout from "../layouts/Layout.astro";
+
+export const prerender = false;
 ---
 
 <Layout>
   <Welcome />
+  <script>
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("finpath_jwt_token");
+      const target = token ? "/reports" : "/login";
+      window.location.replace(target);
+    }
+  </script>
 </Layout>

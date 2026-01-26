@@ -13,6 +13,7 @@ Widok `/transactions` umożliwia zalogowanemu użytkownikowi przeglądanie, filt
   - `CycleSwitcher`
   - `FiltersBar` (startDate, endDate, sortBy, sortOrder)
   - CTA `AddTransactionButton` → `AddTransactionModal` z `TransactionForm`
+- Akcje wiersza: `EditTransaction` (re-use modal), `DeleteTransaction` (confirm dialog)
   - Obszar danych:
     - Stan ładowania: `SkeletonLoader`
     - Stan błędu: `ErrorAlert`
@@ -25,10 +26,10 @@ Widok `/transactions` umożliwia zalogowanemu użytkownikowi przeglądanie, filt
 ## 4. Szczegóły komponentów
 ### TransactionsPage
 - Opis: Kontener widoku, zarządza stanem filtrów/paginacji/cyklu, pobiera dane i renderuje odpowiedni stan.
-- Główne elementy: układ sekcji nagłówka (cykl + filtry + CTA), sekcja wyników, paginacja.
-- Interakcje: zmiana cyklu, filtrów, sortowania, paginacji; otwarcie modala dodawania; odświeżanie listy po mutacjach.
+- Główne elementy: układ sekcji nagłówka (cykl + filtry + CTA), sekcja wyników, paginacja, kontrola modali (add/edit) i dialogu usuwania.
+- Interakcje: zmiana cyklu, filtrów, sortowania, paginacji; otwarcie modala dodawania/edycji; inicjacja usuwania z potwierdzeniem; odświeżanie listy po mutacjach.
 - Walidacja: weryfikacja zakresu dat (start ≤ end), numeryczne page/limit.
-- Typy: `TransactionsViewState`, `TransactionFilters`, `TransactionsResponse`.
+- Typy: `TransactionsViewState`, `TransactionFilters`, `TransactionsResponse`, `TransactionFormData`.
 - Propsy: brak (widok routowany).
 
 ### CycleSwitcher
@@ -49,19 +50,19 @@ Widok `/transactions` umożliwia zalogowanemu użytkownikowi przeglądanie, filt
 
 ### TransactionsTable (desktop)
 - Opis: Tabela transakcji dla szerokich ekranów.
-- Główne elementy: nagłówki sortowalne dla `date`, `amount`; wiersze z datą, kwotą, podkategorią, opisem; ewentualnie menu akcji (edit/delete).
-- Interakcje: klik w nagłówek sortujący, klik w akcje wiersza.
+- Główne elementy: nagłówki sortowalne dla `date`, `amount`; wiersze z datą, kwotą, podkategorią, opisem; menu akcji (edit/delete).
+- Interakcje: klik w nagłówek sortujący, klik w akcje wiersza (edycja/usuń).
 - Walidacja: brak własnej (dane wyświetlane).
 - Typy: `TransactionRowVM[]`.
-- Propsy: `rows: TransactionRowVM[]`, `sortBy`, `sortOrder`, `onSortChange(sortBy, sortOrder)`, opcjonalnie `onEdit(id)`, `onDelete(id)`.
+- Propsy: `rows: TransactionRowVM[]`, `sortBy`, `sortOrder`, `onSortChange(sortBy, sortOrder)`, `onEdit(id)`, `onDelete(id)`.
 
 ### TransactionsList (mobile)
 - Opis: Lista kart dla małych ekranów.
-- Główne elementy: karty z datą, kwotą, kategorią, opisem; akcje wtórne.
+- Główne elementy: karty z datą, kwotą, kategorią, opisem; akcje wtórne (edit/delete).
 - Interakcje: analogicznie do tabeli (akcje, ewentualnie sort via global filters).
 - Walidacja: brak własnej.
 - Typy: `TransactionRowVM[]`.
-- Propsy: `items: TransactionRowVM[]`, `onEdit?`, `onDelete?`.
+- Propsy: `items: TransactionRowVM[]`, `onEdit`, `onDelete`.
 
 ### Pagination
 - Opis: Nawigacja po stronach.
@@ -88,12 +89,20 @@ Widok `/transactions` umożliwia zalogowanemu użytkownikowi przeglądanie, filt
 - Propsy: opcjonalnie `variant: 'table' | 'list'`.
 
 ### AddTransactionModal + TransactionForm
-- Opis: Modal z formularzem dodawania przychodu/ wydatku.
+- Opis: Modal z formularzem dodawania/edycji przychodu lub wydatku (re-use dla PUT).
 - Główne elementy: pola `amount`, `currency` (pre-set PLN), `type` (income/expense), `subcategory` (picker), `date` (default dziś), `description` (textarea 200 max), przyciski `Zapisz`/`Anuluj`.
-- Interakcje: submit (POST), cancel, zmiana pola, wybór kategorii, przełącznik typu.
+- Interakcje: submit (POST przy create, PUT przy edit), cancel, zmiana pola, wybór kategorii, przełącznik typu.
 - Walidacja: `amount > 0`, `subcategoryId` wymagane, `description.length <= 200`, `date` w formacie `YYYY-MM-DD`.
 - Typy: `TransactionFormData`, `SubcategoryNode`.
-- Propsy: `open: boolean`, `onClose()`, `onSuccess()` (refetch), `mode?: 'create'|'edit'`, `initialData?: TransactionFormData`.
+- Propsy: `open: boolean`, `onClose()`, `onSuccess()` (refetch), `mode?: 'create'|'edit'`, `initialData?: TransactionFormData`, `transactionId?: string`.
+
+### DeleteTransactionDialog
+- Opis: Dialog potwierdzenia usunięcia pojedynczej transakcji.
+- Główne elementy: komunikat, przyciski `Usuń`/`Anuluj`.
+- Interakcje: potwierdzenie wywołuje `onConfirm(id)`, anulowanie zamyka dialog.
+- Walidacja: brak dodatkowej; blokada podwójnego submitu przy pending.
+- Typy: `DeleteActionState`.
+- Propsy: `open: boolean`, `transactionId: string`, `onConfirm(id: string)`, `onCancel()`, `isLoading?: boolean`.
 
 ### CategoryTreePicker
 - Opis: Wybór podkategorii z drzewem i wyszukiwaniem + sekcja ostatnio używanych.
@@ -123,21 +132,24 @@ Widok `/transactions` umożliwia zalogowanemu użytkownikowi przeglądanie, filt
 - `TransactionFilters { page: number; limit: number; sortBy: 'date' | 'amount'; sortOrder: 'asc' | 'desc'; startDate?: string; endDate?: string }`
 - `CycleRange { label: string; startDate: string; endDate: string }`
 - `TransactionFormData { amount: number; currency: 'PLN'; subcategoryId: string; date: string; description?: string; type: 'income' | 'expense' }`
+- `TransactionUpdateDTO { amount?: number; currency?: 'PLN'; subcategoryId?: string; date?: string; description?: string; type?: 'income' | 'expense' }`
+- `DeleteActionState { id?: string; isSubmitting: boolean }`
 - `ErrorShape { message: string; fieldErrors?: Record<string, string> }`
 Sprawdź czy jakiś typ już przypadkiem nie istnieje
 
 ## 6. Zarządzanie stanem
-- Źródła stanu lokalnego w `TransactionsPage`: `filters`, `currentCycle`, `showAddModal`, `pendingAction`, `selectedLimit` (opcjonalnie).
+- Źródła stanu lokalnego w `TransactionsPage`: `filters`, `currentCycle`, `showAddModal`, `showEditModal`, `editTransactionId`, `deleteState` (id + pending), `pendingAction`, `selectedLimit` (opcjonalnie).
 - Hook do pobierania: `useTransactions(filters: TransactionFilters)` → zwraca `{ data, isLoading, error, refetch }`; wykorzystuje istniejący klient HTTP lub TanStack Query, jeśli dostępny w projekcie.
-- Hook do formularza: `useTransactionForm` (obsługa walidacji, submit POST).
+- Hook do formularza: `useTransactionForm` (obsługa walidacji, submit POST/PUT na podstawie `mode`).
+- Hook/usługa do usuwania: `useDeleteTransaction` wywołujący `DELETE /api/transactions/{id}` z obsługą pending/error.
 - Inwalidacja/odświeżenie: po `POST/PUT/DELETE` wywołaj `refetch` listy oraz (jeśli istnieje) emit/invalidacja cache dashboardu.
 - Responsywność: przełączanie `TransactionsTable` / `TransactionsList` na podstawie breakpointu CSS (Tailwind) bez dodatkowego stanu.
 
 ## 7. Integracja API
 - Lista: `GET /api/transactions` z query param: `page`, `limit`, `sortBy`, `sortOrder`, `startDate`, `endDate` (domyślnie bieżący cykl).
 - Tworzenie: `POST /api/transactions` body: `{ subcategoryId, amount: { amount, currency: 'PLN' }, date, description? }`.
-- Aktualizacja: `PUT /api/transactions/{id}` (opcjonalna obsługa w UI).
-- Usuwanie: `DELETE /api/transactions/{id}` (opcjonalna obsługa w UI).
+- Aktualizacja: `PUT /api/transactions/{id}` (obsługa edycji; body jak POST).
+- Usuwanie: `DELETE /api/transactions/{id}` (obsługa pojedynczej transakcji).
 - Mapowanie danych: DTO → VM z formatowaniem daty/kwoty po stronie FE.
 - Autoryzacja: korzystać z istniejących mechanizmów (cookies/bearer) – endpoint wymaga zalogowanego użytkownika.
 
@@ -146,7 +158,8 @@ Sprawdź czy jakiś typ już przypadkiem nie istnieje
 - Zmiana sortowania → aktualizacja filtrów, refetch.
 - Paginacja → `onPageChange` aktualizuje filtr `page`, refetch.
 - Klik CTA „Dodaj transakcję” → otwarcie modala; submit → walidacja; sukces: toast + refetch listy + zamknięcie modala.
-- (Opcjonalnie) Edycja/Usuwanie wiersza → modal/confirm → `PUT/DELETE` → refetch.
+- Edycja wiersza → otwarcie modala z danymi (`mode=edit`, `initialData`, `transactionId`); submit PUT → toast + refetch + zamknięcie.
+- Usuwanie wiersza → dialog potwierdzenia → DELETE → toast + refetch; w trakcie pending blokada przycisków.
 - Responsywne zachowanie: tabela na >= md, lista kart na < md.
 
 ## 9. Warunki i walidacja
@@ -166,14 +179,15 @@ Sprawdź czy jakiś typ już przypadkiem nie istnieje
 
 ## 11. Kroki implementacji
 1. Skonfiguruj routing `/transactions` z ochroną przed dostępem niezalogowanych.
-2. Dodaj typy w `frontend/src/types.ts` (MoneyAmount, TransactionDTO, TransactionFilters, PaginationDTO, TransactionFormData, CycleRange, VM).
+2. Dodaj typy w `frontend/src/types.ts` (MoneyAmount, TransactionDTO, TransactionFilters, PaginationDTO, TransactionFormData, TransactionUpdateDTO, CycleRange, VM, DeleteActionState).
 3. Utwórz hook `useTransactions` (GET) oraz util do mapowania DTO → VM.
 4. Dodaj `TransactionsPage` z bazowym stanem filtrów (domyślne sortowanie, page=1, limit=30, daty z bieżącego cyklu) i integracją hooka.
 5. Zaimplementuj `CycleSwitcher` i `FiltersBar` z walidacją zakresu dat oraz aktualizacją filtrów.
-6. Dodaj `AddTransactionModal` z `TransactionForm` (walidacja, submit POST) oraz `CategoryTreePicker` (drzewo + „Ostatnio używane”).
-7. Zaimplementuj renderowanie stanów: `SkeletonLoader`, `ErrorAlert` (retry), `EmptyState`.
-8. Zaimplementuj `TransactionsTable` (desktop) i `TransactionsList` (mobile) z obsługą sortowania i akcji wierszy (opcjonalnie edit/delete).
-9. Dodaj `Pagination` i powiąż z filtrem page.
-10. Po sukcesie POST/PUT/DELETE wykonaj refetch listy i (jeśli dostępne) invalidację danych dashboardu.
-11. Dodaj toasty/komunikaty UX (sukces, błąd), upewnij się, że formularz spełnia limit 200 znaków i kwota >0.
-12. Przegląd dostępności (aria dla tabeli, modal focus trap) i responsywności (Tailwind breakpoints), krótki smoke test na desktop/mobile.
+6. Dodaj `AddTransactionModal` z `TransactionForm` (create/update, walidacja, submit POST/PUT) oraz `CategoryTreePicker` (drzewo + „Ostatnio używane”).
+7. Dodaj `DeleteTransactionDialog` i `useDeleteTransaction`; spięcie z akcjami wiersza w tabeli/liście.
+8. Zaimplementuj renderowanie stanów: `SkeletonLoader`, `ErrorAlert` (retry), `EmptyState`.
+9. Zaimplementuj `TransactionsTable` (desktop) i `TransactionsList` (mobile) z obsługą sortowania i akcji wierszy (edit/delete).
+10. Dodaj `Pagination` i powiąż z filtrem page.
+11. Po sukcesie POST/PUT/DELETE wykonaj refetch listy i (jeśli dostępne) invalidację danych dashboardu.
+12. Dodaj toasty/komunikaty UX (sukces, błąd), upewnij się, że formularz spełnia limit 200 znaków i kwota >0.
+13. Przegląd dostępności (aria dla tabeli, modal focus trap) i responsywności (Tailwind breakpoints), krótki smoke test na desktop/mobile.

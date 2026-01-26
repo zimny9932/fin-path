@@ -1,5 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import type { BudgetViewModel, MainCategoryDTO, SubcategoryDTO, BudgetResponseDTO, BudgetLimitViewModel as BudgetLimitResponseDTO, BudgetInputDTO } from '@/types';
+import type {
+  BudgetViewModel,
+  MainCategoryDTO,
+  SubcategoryDTO,
+  BudgetLimitViewModel as BudgetLimitResponseDTO,
+  BudgetInputDTO,
+} from '@/types';
 import { apiFetch } from '@/lib/api';
 import { toast } from 'sonner';
 
@@ -11,11 +17,19 @@ export const useBudgetForm = (year: number, month: number) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const toArray = <T,>(data: any): T[] => {
+      if (Array.isArray(data)) return data as T[];
+      if (Array.isArray(data?.['hydra:member'])) return data['hydra:member'] as T[];
+      if (Array.isArray(data?.member)) return data.member as T[];
+      if (Array.isArray(data?.items)) return data.items as T[];
+      return [];
+    };
+
     const fetchData = async () => {
       setIsLoading(true);
       setError(null);
       try {
-        const [mainCats, subCats, budgetData] = await Promise.all([
+        const [mainCatsRaw, subCatsRaw, budgetData] = await Promise.all([
           apiFetch('/api/enums/main-categories'),
           apiFetch('/api/subcategories?type=expense'),
           apiFetch(`/api/budgets/${year}/${month}`).catch(err => {
@@ -24,42 +38,47 @@ export const useBudgetForm = (year: number, month: number) => {
           })
         ]);
 
+        const mainCats = toArray<MainCategoryDTO>(mainCatsRaw);
+        const subCats = toArray<SubcategoryDTO>(subCatsRaw);
+
         setMainCategories(mainCats);
 
-        const subcategoriesArray = Array.isArray(subCats) ? subCats : [];
-
         let initialLimits;
-        if (budgetData) { // Budżet istnieje, mapujemy jego limity
-            const existingLimits = Array.isArray(budgetData.budgetLimits) ? budgetData.budgetLimits : [];
-            
-            initialLimits = subcategoriesArray.map((sub: SubcategoryDTO) => {
-                const existingLimit = existingLimits.find(
-                    (limit: BudgetLimitResponseDTO) => limit.subcategory.id === sub.id
-                );
+        if (budgetData) {
+          const existingLimits = Array.isArray(budgetData.budgetLimits)
+            ? budgetData.budgetLimits
+            : Array.isArray(budgetData.limits)
+              ? budgetData.limits
+              : [];
 
-                return {
-                    subcategoryId: sub.id,
-                    subcategoryName: sub.name,
-                    mainCategory: sub.mainCategory,
-                    limitAmount: existingLimit ? existingLimit.limitAmount.amount : 0,
-                };
-            });
-        } else { // Budżet nie istnieje, tworzymy puste limity
-             initialLimits = subcategoriesArray.map((sub: SubcategoryDTO) => ({
-                subcategoryId: sub.id,
-                subcategoryName: sub.name,
-                mainCategory: sub.mainCategory,
-                limitAmount: 0,
-            }));
+          initialLimits = subCats.map((sub: SubcategoryDTO) => {
+            const existingLimit = existingLimits.find(
+              (limit: BudgetLimitResponseDTO) => limit.subcategory.id === sub.id
+            );
+
+            return {
+              subcategoryId: sub.id,
+              subcategoryName: sub.name,
+              mainCategory: sub.mainCategory,
+              limitAmount: existingLimit ? existingLimit.limitAmount.amount : 0,
+            };
+          });
+        } else {
+          initialLimits = subCats.map((sub: SubcategoryDTO) => ({
+            subcategoryId: sub.id,
+            subcategoryName: sub.name,
+            mainCategory: sub.mainCategory,
+            limitAmount: 0,
+          }));
         }
 
         setBudget({
           id: budgetData?.id || null,
           year,
           month,
-          plannedIncome: budgetData?.plannedIncome.amount || 0,
+          plannedIncome: budgetData?.plannedIncome?.amount || 0,
           limits: initialLimits,
-          currency: budgetData?.plannedIncome.currency || 'PLN',
+          currency: budgetData?.plannedIncome?.currency || 'PLN',
         });
 
       } catch (e: any) {

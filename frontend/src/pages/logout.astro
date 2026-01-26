@@ -1,0 +1,26 @@
+---
+import { clearTokens } from "@/lib/auth";
+
+export const prerender = false;
+---
+
+<script>
+  if (typeof window !== "undefined") {
+    // Czyść tokeny lokalne
+    import("/src/lib/auth").then((mod) => {
+      mod.clearTokens?.();
+      // Opcjonalnie wyczyść inne dane sesji
+      sessionStorage.clear?.();
+    }).finally(() => {
+      const redirect = "/login";
+      window.location.replace(redirect);
+    });
+  }
+</script>
+
+<main class="flex min-h-screen items-center justify-center bg-background text-foreground">
+  <div class="text-center">
+    <p class="text-lg font-semibold">Wylogowywanie...</p>
+    <p class="text-sm text-muted-foreground mt-2">Za chwilę nastąpi przekierowanie.</p>
+  </div>
+</main>
