@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,12 +6,12 @@ import type { Range } from "@/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
-type QuickRange = {
+interface QuickRange {
   label: string;
   value: Range;
-};
+}
 
-type CycleSwitcherProps = {
+interface CycleSwitcherProps {
   value: Range;
   onChange: (next: Range) => void;
   onApply: (next: Range) => void;
@@ -19,7 +19,7 @@ type CycleSwitcherProps = {
   minDate?: string;
   maxDate?: string;
   externalError?: string | null;
-};
+}
 
 const isValidDate = (value?: string): boolean => {
   if (!value) return true;
@@ -82,6 +82,8 @@ const CycleSwitcher = ({
 }: CycleSwitcherProps) => {
   const [localRange, setLocalRange] = useState<Range>(value);
   const [localError, setLocalError] = useState<string | null>(null);
+  const startDateId = useId();
+  const endDateId = useId();
 
   useEffect(() => {
     setLocalRange(value);
@@ -109,9 +111,10 @@ const CycleSwitcher = ({
     <div className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          <label htmlFor={startDateId} className="flex items-center gap-2 text-sm text-muted-foreground">
             Od
             <Input
+              id={startDateId}
               type="date"
               value={localRange.startDate ?? ""}
               min={minDate}
@@ -119,9 +122,10 @@ const CycleSwitcher = ({
               onChange={(e) => handleUpdate("startDate", e.target.value)}
             />
           </label>
-          <label className="flex items-center gap-2 text-sm text-muted-foreground">
+          <label htmlFor={endDateId} className="flex items-center gap-2 text-sm text-muted-foreground">
             Do
             <Input
+              id={endDateId}
               type="date"
               value={localRange.endDate ?? ""}
               min={minDate}

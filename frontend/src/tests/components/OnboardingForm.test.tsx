@@ -13,9 +13,9 @@ describe("OnboardingForm", () => {
   // Mock window.location.href
   const { location } = window;
   beforeAll(() => {
-    // @ts-ignore
+    // @ts-expect-error JSDOM override for location
     delete window.location;
-    // @ts-ignore
+    // @ts-expect-error JSDOM override for location
     window.location = { href: "" };
   });
   afterAll(() => {
@@ -25,12 +25,8 @@ describe("OnboardingForm", () => {
   it("should render the form with a disabled submit button", () => {
     render(<OnboardingForm />);
 
-    expect(
-      screen.getByRole("heading", { name: /konfiguracja konta/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /zapisz i kontynuuj/i }),
-    ).toBeDisabled();
+    expect(screen.getByRole("heading", { name: /konfiguracja konta/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /zapisz i kontynuuj/i })).toBeDisabled();
     expect(screen.getByText("Wybierz dzień...")).toBeInTheDocument();
   });
 
@@ -76,7 +72,7 @@ describe("OnboardingForm", () => {
     });
 
     await waitFor(() => {
-        expect(window.location.href).toBe("/budget/new");
+      expect(window.location.href).toBe("/budget/new");
     });
   });
 

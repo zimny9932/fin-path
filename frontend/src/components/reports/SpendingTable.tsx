@@ -2,11 +2,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney, formatPercent } from "@/lib/money";
 import type { CurrencyCode, TableRow } from "@/types";
 
-type SpendingTableProps = {
+interface SpendingTableProps {
   rows: TableRow[];
   currency: CurrencyCode;
   isLoading?: boolean;
-};
+}
 
 const SpendingTable = ({ rows, currency, isLoading = false }: SpendingTableProps) => {
   if (isLoading) {
@@ -54,9 +54,7 @@ const SpendingTable = ({ rows, currency, isLoading = false }: SpendingTableProps
                           <div className="h-2 flex-1 rounded-full bg-muted">
                             <div className="h-2 rounded-full bg-primary" style={{ width: `${share}%` }} />
                           </div>
-                          <span className="w-14 text-right text-muted-foreground">
-                            {formatPercent(share)}
-                          </span>
+                          <span className="w-14 text-right text-muted-foreground">{formatPercent(share)}</span>
                         </div>
                       </td>
                     </tr>

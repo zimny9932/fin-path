@@ -1,14 +1,7 @@
 "use client";
 import { useRegistration } from "@/components/hooks/useRegistration";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Toaster } from "@/components/ui/sonner";
@@ -29,11 +22,7 @@ const RegistrationForm = () => {
               <FormItem>
                 <FormLabel>Adres e-mail</FormLabel>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="jan@kowalski.pl"
-                    {...field}
-                  />
+                  <Input type="email" placeholder="jan@kowalski.pl" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -77,4 +66,3 @@ const RegistrationForm = () => {
 };
 
 export default RegistrationForm;
-

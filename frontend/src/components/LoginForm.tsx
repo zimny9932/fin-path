@@ -3,29 +3,20 @@
 import React from "react";
 import { useLoginForm } from "@/components/hooks/useLoginForm";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/PasswordInput";
 import { Toaster } from "@/components/ui/sonner";
 
 const LoginForm = () => {
-  const { formData, errors, isLoading, handleChange, handleSubmit } =
-    useLoginForm();
+  const { formData, errors, isLoading, handleChange, handleSubmit } = useLoginForm();
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Logowanie</CardTitle>
-        <CardDescription>
-          Zaloguj się na swoje konto, aby uzyskać dostęp do panelu.
-        </CardDescription>
+        <CardDescription>Zaloguj się na swoje konto, aby uzyskać dostęp do panelu.</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} noValidate method="post">
@@ -42,9 +33,7 @@ const LoginForm = () => {
                 required
                 aria-invalid={!!errors.email}
               />
-              {errors.email && (
-                <p className="text-sm text-red-500">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
             </div>
             <div className="flex flex-col space-y-1.5">
               <Label htmlFor="password">Hasło</Label>
@@ -57,9 +46,7 @@ const LoginForm = () => {
                 required
                 aria-invalid={!!errors.password}
               />
-              {errors.password && (
-                <p className="text-sm text-red-500">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
             </div>
           </div>
           <div className="flex justify-end pt-4">
@@ -68,7 +55,7 @@ const LoginForm = () => {
             </Button>
           </div>
         </form>
-      <Toaster richColors />
+        <Toaster richColors />
       </CardContent>
     </Card>
   );

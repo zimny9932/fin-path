@@ -67,43 +67,43 @@ export interface OnboardingFormViewModel {
 
 // Budget Planning DTOs and ViewModels
 
-export type CurrencyCode = 'PLN' | (string & {});
+export type CurrencyCode = "PLN" | (string & {});
 
 export interface MoneyDTO {
   amount: number; // kwota w groszach/centach
   currency: CurrencyCode; // np. "PLN"
 }
 
-export type Range = {
+export interface Range {
   startDate?: string;
   endDate?: string;
-};
+}
 
-export type SpendingCategoryReportDTO = {
+export interface SpendingCategoryReportDTO {
   mainCategory: string;
   totalAmount: MoneyDTO;
   percentageOfTotal: number;
-};
+}
 
-export type ReportsViewModel = {
+export interface ReportsViewModel {
   range: Range;
   items: SpendingCategoryReportDTO[];
   totalSpent: MoneyDTO;
   hasData: boolean;
-};
+}
 
-export type ChartDatum = {
+export interface ChartDatum {
   label: string;
   value: number;
   percentage: number;
-};
+}
 
-export type TableRow = {
+export interface TableRow {
   category: string;
   amount: number;
   currency: CurrencyCode;
   percentage: number;
-};
+}
 
 export interface MainCategoryDTO {
   name: string;
@@ -113,7 +113,7 @@ export interface MainCategoryDTO {
 export interface SubcategoryDTO {
   id: string;
   name: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   mainCategory: string; // np. "FOOD"
 }
 
@@ -130,12 +130,12 @@ export interface BudgetInputDTO {
 }
 
 export interface BudgetLimitResponseDTO {
+  id: string;
+  limitAmount: MoneyDTO;
+  subcategory: {
     id: string;
-    limitAmount: MoneyDTO;
-    subcategory: {
-        id: string;
-        name: string;
-    };
+    name: string;
+  };
 }
 
 export interface BudgetResponseDTO {
@@ -164,16 +164,16 @@ export interface BudgetViewModel {
 }
 
 // Transactions
-export type MoneyAmount = {
+export interface MoneyAmount {
   amount: number;
-  currency: 'PLN';
-};
+  currency: "PLN";
+}
 
 export interface SubcategoryNestedDTO {
   id: string;
   name: string;
   mainCategory: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
 }
 
 export interface TransactionDTO {
@@ -195,52 +195,52 @@ export interface TransactionsResponse {
   pagination: PaginationDTO;
 }
 
-export type TransactionFilters = {
+export interface TransactionFilters {
   page: number;
   limit: number;
-  sortBy: 'date' | 'amount';
-  sortOrder: 'asc' | 'desc';
+  sortBy: "date" | "amount";
+  sortOrder: "asc" | "desc";
   startDate?: string;
   endDate?: string;
-};
+}
 
-export type CycleRange = {
+export interface CycleRange {
   label: string;
   startDate: string;
   endDate: string;
-};
+}
 
-export type TransactionRowVM = {
+export interface TransactionRowVM {
   id: string;
   date: string;
   formattedDate: string;
   amount: MoneyAmount;
   formattedAmount: string;
   subcategoryId: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   subcategoryName: string;
   description?: string | null;
-};
+}
 
-export type TransactionFormData = {
+export interface TransactionFormData {
   amount: number;
-  currency: 'PLN';
+  currency: "PLN";
   subcategoryId: string;
   date: string;
   description?: string;
-  type: 'income' | 'expense';
-};
+  type: "income" | "expense";
+}
 
 export type TransactionUpdateDTO = Partial<{
   amount: number;
-  currency: 'PLN';
+  currency: "PLN";
   subcategoryId: string;
   date: string;
   description?: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
 }>;
 
-export type ErrorShape = {
+export interface ErrorShape {
   message: string;
   fieldErrors?: Record<string, string>;
-};
+}

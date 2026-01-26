@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 
-type EmptyStateProps = {
+interface EmptyStateProps {
   title?: string;
   description?: string;
   ctaLabel?: string;
   onCtaClick?: () => void;
-};
+}
 
 const EmptyState = ({
   title = "Brak danych do wyświetlenia.",

@@ -1,35 +1,27 @@
-import { useMemo, useState } from 'react';
-import { useTransactions } from './hooks/useTransactions';
-import type { TransactionFilters, TransactionFormData } from '@/types';
-import { Button } from '@/components/ui/button';
-import FiltersBar from './transactions/FiltersBar';
-import PaginationBar from './transactions/PaginationBar';
-import TransactionsTable from './transactions/TransactionsTable';
-import TransactionsList from './transactions/TransactionsList';
-import AddTransactionModal from './transactions/AddTransactionModal';
-import { apiFetch } from '@/lib/api';
-import { toast } from 'sonner';
-import SkeletonLoader from './transactions/SkeletonLoader';
-import EmptyState from './transactions/EmptyState';
-import ErrorAlert from './transactions/ErrorAlert';
+import { useMemo, useState } from "react";
+import { useTransactions } from "./hooks/useTransactions";
+import type { TransactionFilters, TransactionFormData } from "@/types";
+import { Button } from "@/components/ui/button";
+import FiltersBar from "./transactions/FiltersBar";
+import PaginationBar from "./transactions/PaginationBar";
+import TransactionsTable from "./transactions/TransactionsTable";
+import TransactionsList from "./transactions/TransactionsList";
+import AddTransactionModal from "./transactions/AddTransactionModal";
+import { apiFetch } from "@/lib/api";
+import { toast } from "sonner";
+import SkeletonLoader from "./transactions/SkeletonLoader";
+import EmptyState from "./transactions/EmptyState";
+import ErrorAlert from "./transactions/ErrorAlert";
 
 const defaultFilters: TransactionFilters = {
   page: 1,
   limit: 30,
-  sortBy: 'date',
-  sortOrder: 'desc',
+  sortBy: "date",
+  sortOrder: "desc",
 };
 
 const TransactionsPage = () => {
-  const {
-    data,
-    pagination,
-    isLoading,
-    error,
-    filters,
-    setFilters,
-    refetch,
-  } = useTransactions(defaultFilters);
+  const { data, pagination, isLoading, error, filters, setFilters, refetch } = useTransactions(defaultFilters);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
@@ -43,6 +35,19 @@ const TransactionsPage = () => {
     return total;
   }, [data]);
 
+  const getErrorMessage = (maybeError: unknown, fallback: string) => {
+    if (typeof maybeError === "string") return maybeError;
+    if (
+      maybeError &&
+      typeof maybeError === "object" &&
+      "message" in maybeError &&
+      typeof maybeError.message === "string"
+    ) {
+      return maybeError.message;
+    }
+    return fallback;
+  };
+
   const handlePageChange = (nextPage: number) => {
     setFilters((prev) => ({
       ...prev,
@@ -53,9 +58,9 @@ const TransactionsPage = () => {
   const handleAdd = async (payload: TransactionFormData) => {
     setIsSubmitting(true);
     try {
-      await apiFetch('/api/transactions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      await apiFetch("/api/transactions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subcategoryId: payload.subcategoryId,
           amount: { amount: payload.amount, currency: payload.currency },
@@ -63,11 +68,11 @@ const TransactionsPage = () => {
           description: payload.description,
         }),
       });
-      toast.success('Transakcja dodana.');
+      toast.success("Transakcja dodana.");
       await refetch();
-    } catch (e: any) {
-      toast.error(e?.message || 'Nie udało się dodać transakcji.');
-      throw e;
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Nie udało się dodać transakcji."));
+      throw error;
     } finally {
       setIsSubmitting(false);
     }
@@ -78,8 +83,8 @@ const TransactionsPage = () => {
     setIsSubmitting(true);
     try {
       await apiFetch(`/api/transactions/${editId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           subcategoryId: payload.subcategoryId,
           amount: { amount: payload.amount, currency: payload.currency },
@@ -88,11 +93,11 @@ const TransactionsPage = () => {
           type: payload.type,
         }),
       });
-      toast.success('Transakcja zaktualizowana.');
+      toast.success("Transakcja zaktualizowana.");
       await refetch();
-    } catch (e: any) {
-      toast.error(e?.message || 'Nie udało się zaktualizować transakcji.');
-      throw e;
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Nie udało się zaktualizować transakcji."));
+      throw error;
     } finally {
       setIsSubmitting(false);
       setIsEditOpen(false);
@@ -110,7 +115,7 @@ const TransactionsPage = () => {
       currency: tx.amount.currency,
       subcategoryId: tx.subcategoryId,
       date: tx.date,
-      description: tx.description ?? '',
+      description: tx.description ?? "",
       type: tx.type,
     });
     setIsEditOpen(true);
@@ -121,14 +126,14 @@ const TransactionsPage = () => {
     setIsDeleting(true);
     try {
       await apiFetch(`/api/transactions/${deleteId}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
       });
-      toast.success('Transakcja usunięta.');
+      toast.success("Transakcja usunięta.");
       await refetch();
-    } catch (e: any) {
-      toast.error(e?.message || 'Nie udało się usunąć transakcji.');
-      throw e;
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error, "Nie udało się usunąć transakcji."));
+      throw error;
     } finally {
       setIsDeleting(false);
       setDeleteId(null);
@@ -142,9 +147,7 @@ const TransactionsPage = () => {
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-3xl font-semibold tracking-tight">Transakcje</h1>
           <div className="text-right text-sm text-muted-foreground">
-            <p>
-              Łącznie: {(summary / 100).toLocaleString('pl-PL', { style: 'currency', currency: 'PLN' })}
-            </p>
+            <p>Łącznie: {(summary / 100).toLocaleString("pl-PL", { style: "currency", currency: "PLN" })}</p>
             <p>
               Strona {pagination.currentPage} / {pagination.totalPages}
             </p>
@@ -166,40 +169,22 @@ const TransactionsPage = () => {
         </div>
       </header>
 
-      <AddTransactionModal
-        open={isAddOpen}
-        onClose={() => setIsAddOpen(false)}
-        onSubmit={handleAdd}
-      />
+      <AddTransactionModal open={isAddOpen} onClose={() => setIsAddOpen(false)} onSubmit={handleAdd} />
 
       {isLoading && <SkeletonLoader variant="table" />}
 
-      {error && !isLoading && (
-        <ErrorAlert message={error} onRetry={refetch} />
-      )}
+      {error && !isLoading && <ErrorAlert message={error} onRetry={refetch} />}
 
-      {!isLoading && !error && data.length === 0 && (
-        <EmptyState onAdd={() => setIsAddOpen(true)} />
-      )}
+      {!isLoading && !error && data.length === 0 && <EmptyState onAdd={() => setIsAddOpen(true)} />}
 
       {!isLoading && !error && data.length > 0 && (
         <div className="grid gap-3">
-          <TransactionsTable
-            rows={data}
-            onEdit={openEditModal}
-            onDelete={(id) => setDeleteId(id)}
-          />
-          <TransactionsList
-            items={data}
-            onEdit={openEditModal}
-            onDelete={(id) => setDeleteId(id)}
-          />
+          <TransactionsTable rows={data} onEdit={openEditModal} onDelete={(id) => setDeleteId(id)} />
+          <TransactionsList items={data} onEdit={openEditModal} onDelete={(id) => setDeleteId(id)} />
         </div>
       )}
 
-      {!isLoading && (
-        <PaginationBar pagination={pagination} onPageChange={handlePageChange} />
-      )}
+      {!isLoading && <PaginationBar pagination={pagination} onPageChange={handlePageChange} />}
 
       {isSubmitting && (
         <div className="rounded-lg border border-border bg-card p-4 text-sm text-muted-foreground">
@@ -231,7 +216,7 @@ const TransactionsPage = () => {
                 Anuluj
               </Button>
               <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting ? 'Usuwanie...' : 'Usuń'}
+                {isDeleting ? "Usuwanie..." : "Usuń"}
               </Button>
             </div>
           </div>

@@ -2,18 +2,15 @@ import { useState } from "react";
 import { z } from "zod";
 import { toast } from "sonner";
 import type {
-    LoginFormViewModel,
-    LoginFormValidationViewModel,
-    LoginRequestDTO,
-    RegistrationResponseDto,
+  LoginFormViewModel,
+  LoginFormValidationViewModel,
+  LoginRequestDTO,
+  RegistrationResponseDto,
 } from "@/types";
 import { saveTokens } from "@/lib/auth";
 
 const loginSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: "Pole jest wymagane" })
-    .email({ message: "Nieprawidłowy format e-mail" }),
+  email: z.string().min(1, { message: "Pole jest wymagane" }).email({ message: "Nieprawidłowy format e-mail" }),
   password: z.string().min(1, { message: "Pole jest wymagane" }),
 });
 
@@ -40,8 +37,7 @@ export const useLoginForm = () => {
       const fieldErrors: LoginFormValidationViewModel = {};
       validationResult.error.errors.forEach((error) => {
         if (error.path[0]) {
-          fieldErrors[error.path[0] as keyof LoginFormValidationViewModel] =
-            error.message;
+          fieldErrors[error.path[0] as keyof LoginFormValidationViewModel] = error.message;
         }
       });
       setErrors(fieldErrors);
@@ -69,9 +65,7 @@ export const useLoginForm = () => {
           toast.error("Nieprawidłowy e-mail lub hasło.");
         } else {
           const errorData = await response.json();
-          toast.error(
-            errorData.message || "Wystąpił nieoczekiwany błąd serwera."
-          );
+          toast.error(errorData.message || "Wystąpił nieoczekiwany błąd serwera.");
         }
         return;
       }
@@ -82,7 +76,7 @@ export const useLoginForm = () => {
 
       toast.success("Zalogowano pomyślnie!");
       window.location.href = "/";
-    } catch (error) {
+    } catch {
       toast.error("Wystąpił błąd sieci. Spróbuj ponownie.");
     } finally {
       setIsLoading(false);

@@ -1,5 +1,5 @@
-import type { TransactionRowVM } from '@/types';
-import { Button } from '@/components/ui/button';
+import type { TransactionRowVM } from "@/types";
+import { Button } from "@/components/ui/button";
 
 interface TransactionsTableProps {
   rows: TransactionRowVM[];
@@ -18,9 +18,7 @@ export const TransactionsTable = ({ rows, onEdit, onDelete }: TransactionsTableP
         <span className="text-right">Akcje</span>
       </div>
       {rows.length === 0 ? (
-        <div className="px-4 py-8 text-center text-muted-foreground">
-          Brak transakcji do wyświetlenia.
-        </div>
+        <div className="px-4 py-8 text-center text-muted-foreground">Brak transakcji do wyświetlenia.</div>
       ) : (
         <ul className="divide-y divide-border">
           {rows.map((tx) => (
@@ -28,9 +26,7 @@ export const TransactionsTable = ({ rows, onEdit, onDelete }: TransactionsTableP
               <span>{tx.formattedDate}</span>
               <span className="font-medium">{tx.formattedAmount}</span>
               <span>{tx.subcategoryName}</span>
-              <span className="col-span-2 text-muted-foreground">
-                {tx.description || '—'}
-              </span>
+              <span className="col-span-2 text-muted-foreground">{tx.description || "—"}</span>
               <div className="flex justify-end gap-2">
                 <Button size="sm" variant="outline" onClick={() => onEdit(tx.id)}>
                   Edytuj

@@ -1,5 +1,5 @@
-import { Button } from '@/components/ui/button';
-import type { TransactionFilters } from '@/types';
+import { Button } from "@/components/ui/button";
+import type { TransactionFilters } from "@/types";
 
 interface FiltersBarProps {
   value: TransactionFilters;
@@ -8,7 +8,7 @@ interface FiltersBarProps {
 }
 
 export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
-  const handleDateChange = (key: 'startDate' | 'endDate') => (v: string) => {
+  const handleDateChange = (key: "startDate" | "endDate") => (v: string) => {
     onChange({
       ...value,
       page: 1,
@@ -16,7 +16,7 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
     });
   };
 
-  const handleSortChange = (key: 'sortBy' | 'sortOrder', v: string) => {
+  const handleSortChange = (key: "sortBy" | "sortOrder", v: string) => {
     onChange({
       ...value,
       page: 1,
@@ -39,8 +39,8 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
           Od
           <input
             type="date"
-            value={value.startDate ?? ''}
-            onChange={(e) => handleDateChange('startDate')(e.target.value)}
+            value={value.startDate ?? ""}
+            onChange={(e) => handleDateChange("startDate")(e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
         </label>
@@ -48,8 +48,8 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
           Do
           <input
             type="date"
-            value={value.endDate ?? ''}
-            onChange={(e) => handleDateChange('endDate')(e.target.value)}
+            value={value.endDate ?? ""}
+            onChange={(e) => handleDateChange("endDate")(e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           />
         </label>
@@ -60,7 +60,7 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
           Sortuj po
           <select
             value={value.sortBy}
-            onChange={(e) => handleSortChange('sortBy', e.target.value)}
+            onChange={(e) => handleSortChange("sortBy", e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="date">Dacie</option>
@@ -71,7 +71,7 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
           Kolejność
           <select
             value={value.sortOrder}
-            onChange={(e) => handleSortChange('sortOrder', e.target.value)}
+            onChange={(e) => handleSortChange("sortOrder", e.target.value)}
             className="rounded-md border border-input bg-background px-3 py-2 text-sm"
           >
             <option value="desc">Malejąco</option>
@@ -94,11 +94,7 @@ export const FiltersBar = ({ value, onChange, onReset }: FiltersBarProps) => {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => onReset()}
-        >
+        <Button variant="secondary" size="sm" onClick={() => onReset()}>
           Resetuj
         </Button>
       </div>
