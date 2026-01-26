@@ -52,7 +52,8 @@ jobs:
           --health-cmd="pg_isready -U app -d fin_path"
           --health-interval=5s
           --health-timeout=5s
-          --health-retries=5
+          --health-retries=12
+          --health-start-period=30s
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -64,11 +65,11 @@ jobs:
 
       - name: Wait for database
         run: |
-          for i in {1..20}; do
+          for i in {1..40}; do
             if pg_isready -h postgres -p 5432 -U app -d fin_path; then
               exit 0
             fi
-            sleep 3
+            sleep 5
           done
           echo "Database not ready" >&2
           exit 1
