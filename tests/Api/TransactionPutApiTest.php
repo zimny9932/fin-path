@@ -125,7 +125,7 @@ final class TransactionPutApiTest extends ApiTestCase
         self::assertJsonContains([
             'violations' => [
                 ['propertyPath' => 'subcategoryId', 'message' => 'This is not a valid UUID.'],
-                ['propertyPath' => 'amount.amount', 'message' => 'This value should be positive.'],
+                ['propertyPath' => 'amount.amount', 'message' => 'This value should be either positive or zero.'],
                 ['propertyPath' => 'amount.currency', 'message' => 'This value is not a valid currency.'],
                 ['propertyPath' => 'date', 'message' => 'This value is not a valid date.'],
             ],
