@@ -70,5 +70,6 @@ export default tseslint.config(
   reactConfig,
   eslintPluginAstro.configs["flat/recommended"],
   eslintPluginPrettier,
+  { rules: { "prettier/prettier": "off" } },
   astroPrettierConfig
 );
