@@ -1,0 +1,25 @@
+name: Setup frontend
+description: Install Node.js and frontend dependencies with caching.
+inputs:
+  node-version:
+    description: Node.js version to install
+    required: false
+    default: "20"
+  working-directory:
+    description: Directory containing package.json
+    required: false
+    default: frontend
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: npm
+        cache-dependency-path: ${{ inputs.working-directory }}/package-lock.json
+
+    - name: Install Node dependencies
+      shell: bash
+      run: npm ci
+      working-directory: ${{ inputs.working-directory }}

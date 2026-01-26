@@ -1,0 +1,34 @@
+name: Setup backend
+description: Configure PHP and install Composer dependencies with caching.
+inputs:
+  php-version:
+    description: PHP version to install
+    required: false
+    default: "8.4"
+runs:
+  using: composite
+  steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ inputs.php-version }}
+        extensions: intl
+        coverage: xdebug
+        tools: composer
+
+    - name: Get Composer cache directory
+      id: composer-cache
+      shell: bash
+      run: echo "dir=$(composer config cache-files-dir)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache Composer dependencies
+      uses: actions/cache@v5
+      with:
+        path: ${{ steps.composer-cache.outputs.dir }}
+        key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-composer-
+
+    - name: Install PHP dependencies
+      shell: bash
+      run: composer install --no-interaction --prefer-dist --no-progress
