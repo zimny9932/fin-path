@@ -25,13 +25,6 @@ jobs:
           node-version: 20
           working-directory: frontend
 
-      # Backend setup runs from repo root so Composer and bin/console are available.
-      - name: Setup backend
-        uses: ./.github/actions/setup-backend
-        with:
-          php-version: 8.4
-        working-directory: .
-
       - name: Lint
         run: npm run lint
 
