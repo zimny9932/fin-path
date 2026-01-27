@@ -37,7 +37,7 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
-      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || '' }}
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
     services:
       postgres:
@@ -57,6 +57,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+        with:
+          php-version: 8.4
 
       - name: Wait for database
         env:
