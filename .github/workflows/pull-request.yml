@@ -110,7 +110,7 @@ jobs:
     env:
       APP_ENV: integration
       APP_SECRET: ${{ secrets.APP_SECRET || '' }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL || '' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || '' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
@@ -119,9 +119,58 @@ jobs:
       PLAYWRIGHT_PORT: ${{ secrets.PLAYWRIGHT_PORT || '3000' }}
       PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3000' }}
       NODE_V8_COVERAGE: ${{ github.workspace }}/frontend/coverage/playwright
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: fin_path
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U app -d fin_path"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+          --health-start-period=30s
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+        with:
+          php-version: 8.4
+
+      - name: Wait for database
+        env:
+          PGPASSWORD: app
+        run: |
+          for i in {1..40}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U app -d fin_path; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Database not ready" >&2
+          docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
+          docker logs postgres || true
+          exit 1
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+        working-directory: .
+
+      - name: Load fixtures for e2e
+        run: php bin/console doctrine:fixtures:load --no-interaction
+        working-directory: .
+
+      - name: Start backend server
+        run: |
+          nohup php -S 0.0.0.0:8081 -t public public/index.php > /tmp/backend-server.log 2>&1 &
+          echo $! > /tmp/backend-server.pid
+        working-directory: .
 
       - name: Setup frontend
         uses: ./.github/actions/setup-frontend
