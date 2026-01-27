@@ -34,7 +34,7 @@ jobs:
     env:
       APP_ENV: test
       APP_SECRET: ${{ secrets.APP_SECRET || 'test-secret' }}
-      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@postgres:5432/fin_path?serverVersion=17&charset=utf8' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || '' }}
@@ -64,14 +64,18 @@ jobs:
           php-version: 8.4
 
       - name: Wait for database
+        env:
+          PGPASSWORD: app
         run: |
           for i in {1..40}; do
-            if pg_isready -h postgres -p 5432 -U app -d fin_path; then
+            if pg_isready -h 127.0.0.1 -p 5432 -U app -d fin_path; then
               exit 0
             fi
             sleep 5
           done
           echo "Database not ready" >&2
+          docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
+          docker logs postgres || true
           exit 1
 
       - name: Run migrations
