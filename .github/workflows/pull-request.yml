@@ -81,9 +81,6 @@ jobs:
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: Load fixtures
-        run: php bin/console doctrine:fixtures:load --no-interaction
-
       - name: Prepare coverage directory
         run: mkdir -p var/coverage-phpunit
 
