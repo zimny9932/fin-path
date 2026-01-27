@@ -109,10 +109,10 @@ jobs:
         working-directory: frontend
     env:
       APP_ENV: integration
-      APP_SECRET: ${{ secrets.APP_SECRET || '' }}
+      APP_SECRET: ${{ secrets.APP_SECRET || 'test-secret' }}
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
-      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || '' }}
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
       PLAYWRIGHT_HOST: ${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}
@@ -157,6 +157,9 @@ jobs:
           docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
           docker logs postgres || true
           exit 1
+
+      - name: Generate JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --no-interaction
 
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction
