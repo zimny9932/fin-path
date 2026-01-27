@@ -25,6 +25,13 @@ jobs:
           node-version: 20
           working-directory: frontend
 
+      # Backend setup runs from repo root so Composer and bin/console are available.
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+        with:
+          php-version: 8.4
+        working-directory: .
+
       - name: Lint
         run: npm run lint
 
@@ -57,11 +64,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-
-      - name: Setup backend
-        uses: ./.github/actions/setup-backend
-        with:
-          php-version: 8.4
 
       - name: Wait for database
         env:
@@ -157,9 +159,11 @@ jobs:
           docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
           docker logs postgres || true
           exit 1
+        working-directory: .
 
       - name: Generate JWT keypair
         run: php bin/console lexik:jwt:generate-keypair --no-interaction
+        working-directory: .
 
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction
