@@ -115,9 +115,9 @@ jobs:
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || '' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
-      PLAYWRIGHT_HOST: ${{ secrets.PLAYWRIGHT_HOST || 'localhost' }}
+      PLAYWRIGHT_HOST: ${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}
       PLAYWRIGHT_PORT: ${{ secrets.PLAYWRIGHT_PORT || '3000' }}
-      PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || '' }}
+      PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3000' }}
       NODE_V8_COVERAGE: ${{ github.workspace }}/frontend/coverage/playwright
     steps:
       - name: Checkout repository

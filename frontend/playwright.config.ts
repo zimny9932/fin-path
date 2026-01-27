@@ -3,7 +3,8 @@ import { defineConfig, devices } from "@playwright/test";
 const HOST = process.env.PLAYWRIGHT_HOST ?? "localhost";
 // Astro dev domyślnie nasłuchuje na 3000, więc ustawiamy 3000 jako sensowny default.
 const PORT = process.env.PLAYWRIGHT_PORT ?? "3000";
-const baseURL = process.env.PLAYWRIGHT_BASE_URL ?? `http://${HOST}:${PORT}`;
+// Use truthy check so empty env values fall back to default localhost URL.
+const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://${HOST}:${PORT}`;
 
 /**
  * Read environment variables from file.
