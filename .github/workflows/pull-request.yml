@@ -63,6 +63,9 @@ jobs:
           cat > .env.local <<'EOF'
           DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
           EOF
+          cat > .env.integration.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
         working-directory: .
 
       - name: Setup backend
@@ -182,6 +185,8 @@ jobs:
         working-directory: .
 
       - name: Start backend server
+        env:
+          DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
           nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
           echo $! > /tmp/backend-server.pid
