@@ -53,8 +53,22 @@ test.describe("Logowanie - happy path", () => {
       throw new Error(`Login request failed: ${failedRequest.failure()?.errorText ?? "unknown error"}`);
     }
 
-    const loginResponse = await loginResponsePromise;
-    expect(loginResponse.ok()).toBeTruthy();
+    const loginResponse = await loginResponsePromise.catch((error: unknown) => {
+      throw new Error(`Nie otrzymano odpowiedzi /api/login w limicie czasu: ${String(error)}`);
+    });
+
+    if (!loginResponse.ok()) {
+      let responseBody = "";
+      try {
+        responseBody = await loginResponse.text();
+      } catch (readError) {
+        responseBody = `Nie udało się odczytać body odpowiedzi: ${String(readError)}`;
+      }
+
+      throw new Error(
+        `Nieudane logowanie. Status: ${loginResponse.status()} ${loginResponse.statusText()}. Body: ${responseBody}`,
+      );
+    }
 
     await page.waitForURL(/\/reports/);
     await expect(page.getByRole("heading", { name: "Raporty" })).toBeVisible();

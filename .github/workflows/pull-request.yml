@@ -208,7 +208,20 @@ jobs:
         run: npx playwright install --with-deps
 
       - name: Run Playwright e2e tests
-        run: npx playwright test --config=playwright.config.ts --reporter=html
+        env:
+          PLAYWRIGHT_WEB_SERVER_TIMEOUT: 120000
+        run: npx playwright test --config=playwright.config.ts
+
+      - name: Dump backend log on failure
+        if: failure() || cancelled()
+        run: |
+          if [ -f /tmp/backend-server.log ]; then
+            echo "=== /tmp/backend-server.log ==="
+            tail -n 400 /tmp/backend-server.log
+          else
+            echo "Backend log not found"
+          fi
+        working-directory: .
 
       - name: Upload Playwright report
         if: always() && hashFiles('frontend/playwright-report/index.html') != ''
