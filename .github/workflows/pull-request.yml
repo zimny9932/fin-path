@@ -135,8 +135,8 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
-      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'config/jwt/private.pem' }}
-      JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY || 'config/jwt/public.pem' }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || format('{0}/config/jwt/private.pem', github.workspace) }}
+      JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY || format('{0}/config/jwt/public.pem', github.workspace) }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
       BACKEND_HOST: ${{ secrets.BACKEND_HOST || '127.0.0.1' }}
@@ -167,17 +167,17 @@ jobs:
 
       - name: Override env for CI backend
         run: |
-          cat > .env.local <<'EOF'
-          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
-          JWT_SECRET_KEY=${JWT_SECRET_KEY:-config/jwt/private.pem}
-          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY:-config/jwt/public.pem}
-          JWT_PASSPHRASE=${JWT_PASSPHRASE:-test-passphrase}
+          cat > .env.local <<EOF
+          DATABASE_URL=${DATABASE_URL}
+          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE}
           EOF
-          cat > .env.integration.local <<'EOF'
-          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
-          JWT_SECRET_KEY=${JWT_SECRET_KEY:-config/jwt/private.pem}
-          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY:-config/jwt/public.pem}
-          JWT_PASSPHRASE=${JWT_PASSPHRASE:-test-passphrase}
+          cat > .env.integration.local <<EOF
+          DATABASE_URL=${DATABASE_URL}
+          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE}
           EOF
 
       - name: Debug env and config files
