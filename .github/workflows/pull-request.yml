@@ -186,8 +186,11 @@ jobs:
 
       - name: Start backend server
         env:
+          APP_ENV: ${{ env.APP_ENV }}
+          APP_DEBUG: 0
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
+          export APP_ENV APP_DEBUG DATABASE_URL
           nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
           echo $! > /tmp/backend-server.pid
         working-directory: .
