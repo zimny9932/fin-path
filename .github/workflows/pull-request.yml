@@ -330,9 +330,19 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const { LINT_STATUS, UNIT_STATUS, E2E_STATUS } = process.env;
+            const { LINT_STATUS, UNIT_STATUS, E2E_STATUS, GITHUB_REPOSITORY } = process.env;
+            const issueNumber = context.payload.pull_request?.number ?? context.issue?.number;
+            const [ownerFromEnv, repoFromEnv] = (GITHUB_REPOSITORY || "").split("/");
+            const owner = context.repo?.owner || ownerFromEnv;
+            const repo = context.repo?.name || repoFromEnv;
+
+            if (!owner || !repo || !issueNumber) {
+              core.setFailed(`Missing owner/repo/issueNumber (owner=${owner} repo=${repo} issue=${issueNumber})`);
+              return;
+            }
+
             const lines = [
-              `Workflow status for #${context.issue.number}:`,
+              `Workflow status for #${issueNumber}:`,
               `- Lint: ${LINT_STATUS}`,
               `- Unit (PHPUnit): ${UNIT_STATUS}`,
               `- E2E (Playwright): ${E2E_STATUS}`,
@@ -341,9 +351,10 @@ jobs:
               '• playwright-report',
               '• playwright-coverage',
             ];
+
             await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
+              issue_number: issueNumber,
+              owner,
+              repo,
               body: lines.join('\n'),
             });
