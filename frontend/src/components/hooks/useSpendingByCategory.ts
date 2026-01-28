@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { getSpendingByCategory } from "@/lib/api/reports";
-import type {
-  ChartDatum,
-  MoneyDTO,
-  Range,
-  ReportsViewModel,
-  SpendingCategoryReportDTO,
-  TableRow,
-} from "@/types";
+import type { ChartDatum, MoneyDTO, Range, ReportsViewModel, SpendingCategoryReportDTO, TableRow } from "@/types";
 
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -64,6 +57,17 @@ export const useSpendingByCategory = (initialRange: Range = {}) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const normalizeError = (maybeError: unknown) => {
+    if (maybeError && typeof maybeError === "object") {
+      const errorObject = maybeError as { status?: number; message?: string };
+      return {
+        status: errorObject.status,
+        message: errorObject.message,
+      };
+    }
+    return { status: undefined, message: undefined };
+  };
+
   const fetchData = useCallback(
     async (overrideRange?: Range) => {
       const nextRange = overrideRange ?? range;
@@ -83,48 +87,41 @@ export const useSpendingByCategory = (initialRange: Range = {}) => {
             item &&
             typeof item.mainCategory === "string" &&
             typeof item.totalAmount?.amount === "number" &&
-            typeof item.percentageOfTotal === "number",
+            typeof item.percentageOfTotal === "number"
         );
 
         const currency = sanitizedItems[0]?.totalAmount?.currency ?? "PLN";
-        const computedTotal = sanitizedItems.reduce(
-          (acc, item) => acc + Math.max(0, item.totalAmount.amount ?? 0),
-          0,
-        );
+        const computedTotal = sanitizedItems.reduce((acc, item) => acc + Math.max(0, item.totalAmount.amount ?? 0), 0);
 
-        const mappedRows = mapRows(sanitizedItems, currency).sort(
-          (a, b) => b.amount - a.amount,
-        );
+        const mappedRows = mapRows(sanitizedItems, currency).sort((a, b) => b.amount - a.amount);
 
         setData(sanitizedItems);
         setRows(mappedRows);
         setChartData(mapChartData(mappedRows));
         setTotalSpent({ amount: computedTotal, currency });
-      } catch (e: any) {
-        if (e?.status === 401) {
+      } catch (error: unknown) {
+        const { status, message } = normalizeError(error);
+        if (status === 401) {
           setError("Sesja wygasła. Zaloguj się ponownie.");
           return;
         }
-        if (e?.status === 400) {
-          setError(e?.message ?? "Zakres dat jest nieprawidłowy.");
+        if (status === 400) {
+          setError(message ?? "Zakres dat jest nieprawidłowy.");
           return;
         }
-        setError(e?.message ?? "Nie udało się pobrać raportu.");
+        setError(message ?? "Nie udało się pobrać raportu.");
       } finally {
         setLoading(false);
       }
     },
-    [range],
+    [range]
   );
 
   useEffect(() => {
     void fetchData();
   }, [fetchData]);
 
-  const hasData = useMemo(
-    () => rows.some((row) => row.amount > 0),
-    [rows],
-  );
+  const hasData = useMemo(() => rows.some((row) => row.amount > 0), [rows]);
 
   const viewModel: ReportsViewModel = useMemo(
     () => ({
@@ -133,7 +130,7 @@ export const useSpendingByCategory = (initialRange: Range = {}) => {
       totalSpent,
       hasData,
     }),
-    [data, hasData, range, totalSpent],
+    [data, hasData, range, totalSpent]
   );
 
   return {

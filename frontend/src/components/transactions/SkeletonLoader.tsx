@@ -1,16 +1,13 @@
 interface SkeletonLoaderProps {
-  variant?: 'table' | 'list';
+  variant?: "table" | "list";
 }
 
-export const SkeletonLoader = ({ variant = 'table' }: SkeletonLoaderProps) => {
-  if (variant === 'list') {
+export const SkeletonLoader = ({ variant = "table" }: SkeletonLoaderProps) => {
+  if (variant === "list") {
     return (
       <div className="grid gap-3">
         {[...Array(4)].map((_, idx) => (
-          <div
-            key={idx}
-            className="h-20 animate-pulse rounded-lg border border-border bg-muted/40"
-          />
+          <div key={idx} className="h-20 animate-pulse rounded-lg border border-border bg-muted/40" />
         ))}
       </div>
     );

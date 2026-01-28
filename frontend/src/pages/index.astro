@@ -5,9 +5,10 @@ import Layout from "../layouts/Layout.astro";
 export const prerender = false;
 ---
 
+<!-- eslint-disable prettier/prettier -->
 <Layout>
   <Welcome />
-  <script>
+  <script is:inline>
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("finpath_jwt_token");
       const target = token ? "/reports" : "/login";

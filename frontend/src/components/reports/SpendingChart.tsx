@@ -7,33 +7,24 @@ import type { ChartDatum, CurrencyCode } from "@/types";
 
 type ChartMode = "pie" | "bar";
 
-type SpendingChartProps = {
+interface SpendingChartProps {
   data: ChartDatum[];
   currency: CurrencyCode;
   mode?: ChartMode;
   onModeChange?: (mode: ChartMode) => void;
   isLoading?: boolean;
-};
+}
 
-type PieSegment = {
+interface PieSegment {
   startAngle: number;
   endAngle: number;
   color: string;
   label: string;
   percentage: number;
   value: number;
-};
+}
 
-const palette = [
-  "#6366f1",
-  "#22c55e",
-  "#f59e0b",
-  "#ef4444",
-  "#14b8a6",
-  "#8b5cf6",
-  "#0ea5e9",
-  "#f97316",
-];
+const palette = ["#6366f1", "#22c55e", "#f59e0b", "#ef4444", "#14b8a6", "#8b5cf6", "#0ea5e9", "#f97316"];
 
 const polarToCartesian = (radius: number, angleInDegrees: number) => {
   const angleInRadians = ((angleInDegrees - 90) * Math.PI) / 180.0;
@@ -75,10 +66,7 @@ const SpendingChart = ({ data, currency, mode, onModeChange, isLoading = false }
   const [internalMode, setInternalMode] = useState<ChartMode>(mode ?? "pie");
   const activeMode = mode ?? internalMode;
 
-  const totalValue = useMemo(
-    () => data.filter((d) => d.value > 0).reduce((acc, item) => acc + item.value, 0),
-    [data],
-  );
+  const totalValue = useMemo(() => data.filter((d) => d.value > 0).reduce((acc, item) => acc + item.value, 0), [data]);
 
   const segments = useMemo(() => buildPieSegments(data), [data]);
 
@@ -106,7 +94,10 @@ const SpendingChart = ({ data, currency, mode, onModeChange, isLoading = false }
         </svg>
         <div className="flex-1 space-y-3">
           {segments.map((segment, idx) => (
-            <div key={`${segment.label}-legend-${idx}`} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+            <div
+              key={`${segment.label}-legend-${idx}`}
+              className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+            >
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-sm" style={{ backgroundColor: segment.color }} />
                 <span className="text-sm font-medium">{segment.label}</span>

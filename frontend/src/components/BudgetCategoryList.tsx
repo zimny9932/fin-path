@@ -1,12 +1,12 @@
-import React from 'react';
+import React from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import CurrencyInput from "@/components/ui/CurrencyInput";
-import type { MainCategoryDTO, BudgetLimitViewModel } from '@/types';
+import type { BudgetLimitViewModel } from "@/types";
 
 interface GroupedLimit {
-    name: string;
-    value: string;
-    limits: BudgetLimitViewModel[];
+  name: string;
+  value: string;
+  limits: BudgetLimitViewModel[];
 }
 
 interface BudgetCategoryListProps {

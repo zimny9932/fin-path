@@ -1,0 +1,360 @@
+name: Pull Request
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup frontend
+        uses: ./.github/actions/setup-frontend
+        with:
+          node-version: 20
+          working-directory: frontend
+
+      - name: Lint
+        run: npm run lint
+
+  unit-test:
+    runs-on: ubuntu-latest
+    needs: lint
+    env:
+      APP_ENV: test
+      APP_SECRET: ${{ secrets.APP_SECRET || 'test-secret' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
+      CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
+      DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
+      VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: fin_path
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U app -d fin_path"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+          --health-start-period=30s
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Override env for CI backend
+        run: |
+          cat > .env.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
+          cat > .env.integration.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
+        working-directory: ${{ github.workspace }}
+
+      - name: Debug env and config files
+        run: |
+          echo "--- ENV ---"
+          printenv | sort
+          echo "--- .env ---"
+          sed -n '1,120p' .env || true
+          echo "--- .env.local ---"
+          cat .env.local || true
+          echo "--- .env.integration.local ---"
+          cat .env.integration.local || true
+        working-directory: ${{ github.workspace }}
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+        with:
+          php-version: 8.4
+
+      - name: Wait for database
+        env:
+          PGPASSWORD: app
+        run: |
+          for i in {1..40}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U app -d fin_path; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Database not ready" >&2
+          docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
+          docker logs postgres || true
+          exit 1
+
+      - name: Generate JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --no-interaction
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+
+      - name: Prepare coverage directory
+        run: mkdir -p var/coverage-phpunit
+
+      - name: Run PHPUnit
+        run: php -d memory_limit=-1 ./bin/phpunit --coverage-clover var/coverage-phpunit/coverage.xml --coverage-html var/coverage-phpunit/html
+
+      - name: Upload PHPUnit coverage
+        if: always() && hashFiles('var/coverage-phpunit/coverage.xml') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: phpunit-coverage
+          path: |
+            var/coverage-phpunit/coverage.xml
+            var/coverage-phpunit/html
+          retention-days: 7
+
+  e2e-test:
+    runs-on: ubuntu-latest
+    needs: lint
+    environment: integration
+    defaults:
+      run:
+        working-directory: ${{ github.workspace }}
+    env:
+      APP_ENV: integration
+      APP_SECRET: ${{ secrets.APP_SECRET || 'test-secret' }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
+      DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
+      JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || format('{0}/config/jwt/private.pem', github.workspace) }}
+      JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY || format('{0}/config/jwt/public.pem', github.workspace) }}
+      CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
+      VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
+      BACKEND_HOST: ${{ secrets.BACKEND_HOST || '127.0.0.1' }}
+      BACKEND_PORT: ${{ secrets.BACKEND_PORT || '8081' }}
+      BACKEND_URL: "http://${{ secrets.BACKEND_HOST || '127.0.0.1' }}:${{ secrets.BACKEND_PORT || '8081' }}"
+      PLAYWRIGHT_HOST: ${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}
+      PLAYWRIGHT_PORT: ${{ secrets.PLAYWRIGHT_PORT || '3000' }}
+      PLAYWRIGHT_BASE_URL: "http://${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}:${{ secrets.PLAYWRIGHT_PORT || '3000' }}"
+      NODE_V8_COVERAGE: ${{ github.workspace }}/frontend/coverage/playwright
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: fin_path
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U app -d fin_path"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=12
+          --health-start-period=30s
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Override env for CI backend
+        run: |
+          cat > .env.local <<EOF
+          DATABASE_URL=${DATABASE_URL}
+          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE}
+          EOF
+          cat > .env.integration.local <<EOF
+          DATABASE_URL=${DATABASE_URL}
+          JWT_SECRET_KEY=${JWT_SECRET_KEY}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE}
+          EOF
+
+      - name: Debug env and config files
+        run: |
+          echo "--- ENV ---"
+          printenv | sort
+          echo "--- .env ---"
+          sed -n '1,120p' .env || true
+          echo "--- .env.local ---"
+          cat .env.local || true
+          echo "--- .env.integration.local ---"
+          cat .env.integration.local || true
+
+      - name: Setup backend
+        uses: ./.github/actions/setup-backend
+        with:
+          php-version: 8.4
+
+      - name: Wait for database
+        env:
+          PGPASSWORD: app
+        run: |
+          for i in {1..40}; do
+            if pg_isready -h 127.0.0.1 -p 5432 -U app -d fin_path; then
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Database not ready" >&2
+          docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
+          docker logs postgres || true
+          exit 1
+        working-directory: ${{ github.workspace }}
+
+      - name: Generate JWT keypair
+        run: php bin/console lexik:jwt:generate-keypair --no-interaction
+        working-directory: ${{ github.workspace }}
+
+      - name: Run migrations
+        run: php bin/console doctrine:migrations:migrate --no-interaction
+        working-directory: ${{ github.workspace }}
+
+      - name: Load fixtures for e2e
+        run: php bin/console doctrine:fixtures:load --no-interaction
+        working-directory: ${{ github.workspace }}
+
+      - name: Start backend server
+        env:
+          APP_ENV: ${{ env.APP_ENV }}
+          APP_DEBUG: 0
+          DATABASE_URL: ${{ env.DATABASE_URL }}
+          JWT_PASSPHRASE: ${{ env.JWT_PASSPHRASE }}
+          JWT_SECRET_KEY: ${{ env.JWT_SECRET_KEY }}
+          JWT_PUBLIC_KEY: ${{ env.JWT_PUBLIC_KEY }}
+        run: |
+          export APP_ENV APP_DEBUG DATABASE_URL JWT_PASSPHRASE JWT_SECRET_KEY JWT_PUBLIC_KEY
+          echo "=== Backend env for php -S ==="
+          env | sort
+          echo "=== Using DATABASE_URL ==="
+          echo "$DATABASE_URL"
+          echo "=== .env.local ==="
+          cat .env.local || true
+          echo "=== .env.integration.local ==="
+          cat .env.integration.local || true
+          nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
+          echo $! > /tmp/backend-server.pid
+        working-directory: ${{ github.workspace }}
+
+      - name: Wait for backend HTTP healthcheck
+        run: |
+          for i in {1..30}; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" "http://${BACKEND_HOST}:${BACKEND_PORT}/api/login" || true)
+            if [[ "$status" == "401" || "$status" == "400" || "$status" == "405" ]]; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Backend server not responding on http://${BACKEND_HOST}:${BACKEND_PORT}/api/login" >&2
+          if [ -f /tmp/backend-server.log ]; then
+            echo "Last backend log lines:" >&2
+            tail -n 200 /tmp/backend-server.log >&2
+          fi
+          echo "--- Environment seen in healthcheck step ---" >&2
+          env | sort >&2
+          echo "--- .env.local ---" >&2
+          cat .env.local >&2 || true
+          echo "--- .env.integration.local ---" >&2
+          cat .env.integration.local >&2 || true
+          exit 1
+        working-directory: ${{ github.workspace }}
+
+      - name: Setup frontend
+        uses: ./.github/actions/setup-frontend
+        with:
+          node-version: 20
+          working-directory: frontend
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+        working-directory: frontend
+
+      - name: Run Playwright e2e tests
+        env:
+          PLAYWRIGHT_WEB_SERVER_TIMEOUT: 120000
+        run: npx playwright test --config=playwright.config.ts
+        working-directory: frontend
+
+      - name: Dump backend log on failure
+        if: failure() || cancelled()
+        run: |
+          if [ -f /tmp/backend-server.log ]; then
+            echo "=== /tmp/backend-server.log ==="
+            tail -n 400 /tmp/backend-server.log
+          else
+            echo "Backend log not found"
+          fi
+        working-directory: .
+
+      - name: Upload Playwright report
+        if: always() && hashFiles('frontend/playwright-report/index.html') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-report
+          path: frontend/playwright-report
+          retention-days: 7
+
+      - name: Upload Playwright coverage
+        if: always() && hashFiles('frontend/coverage/playwright/**') != ''
+        uses: actions/upload-artifact@v6
+        with:
+          name: playwright-coverage
+          path: frontend/coverage/playwright
+          retention-days: 7
+
+  status-comment:
+    runs-on: ubuntu-latest
+    needs: [lint, unit-test, e2e-test]
+    if: ${{ success() }}
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Post status comment
+        uses: actions/github-script@v8
+        env:
+          LINT_STATUS: ${{ needs.lint.result }}
+          UNIT_STATUS: ${{ needs['unit-test'].result }}
+          E2E_STATUS: ${{ needs['e2e-test'].result }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { LINT_STATUS, UNIT_STATUS, E2E_STATUS, GITHUB_REPOSITORY } = process.env;
+            const issueNumber = context.payload.pull_request?.number ?? context.issue?.number;
+            const [ownerFromEnv, repoFromEnv] = (GITHUB_REPOSITORY || "").split("/");
+            const owner = context.repo?.owner || ownerFromEnv;
+            const repo = context.repo?.name || repoFromEnv;
+
+            if (!owner || !repo || !issueNumber) {
+              core.setFailed(`Missing owner/repo/issueNumber (owner=${owner} repo=${repo} issue=${issueNumber})`);
+              return;
+            }
+
+            const lines = [
+              `Workflow status for #${issueNumber}:`,
+              `- Lint: ${LINT_STATUS}`,
+              `- Unit (PHPUnit): ${UNIT_STATUS}`,
+              `- E2E (Playwright): ${E2E_STATUS}`,
+              'Artifacts:',
+              '• phpunit-coverage',
+              '• playwright-report',
+              '• playwright-coverage',
+            ];
+
+            await github.rest.issues.createComment({
+              issue_number: issueNumber,
+              owner,
+              repo,
+              body: lines.join('\n'),
+            });

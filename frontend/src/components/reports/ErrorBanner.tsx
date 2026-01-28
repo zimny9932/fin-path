@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-type ErrorBannerProps = {
+interface ErrorBannerProps {
   message: string;
   onRetry: () => void;
-};
+}
 
 const ErrorBanner = ({ message, onRetry }: ErrorBannerProps) => (
   <Alert variant="destructive">

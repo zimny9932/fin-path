@@ -15,7 +15,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
   onChange,
   currency = "PLN",
   className,
-  placeholder = "0.00"
+  placeholder = "0.00",
 }) => {
   const [displayValue, setDisplayValue] = useState<string>("");
   const [isFocused, setIsFocused] = useState(false);
@@ -37,7 +37,7 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
       setDisplayValue(sanitizedValue);
       const centsValue = sanitizedValue ? Math.round(parseFloat(sanitizedValue) * 100) : 0;
       if (!isNaN(centsValue)) {
-          onChange(centsValue);
+        onChange(centsValue);
       }
     }
   };
@@ -46,9 +46,9 @@ const CurrencyInput: React.FC<CurrencyInputProps> = ({
     setIsFocused(true);
     // Gdy użytkownik klika w pole, pokazujemy mu wartość bez formatowania, jeśli jest to 0
     if (value === 0) {
-        setDisplayValue("");
+      setDisplayValue("");
     } else {
-        setDisplayValue((value / 100).toString().replace('.', ','));
+      setDisplayValue((value / 100).toString().replace(".", ","));
     }
   };
 

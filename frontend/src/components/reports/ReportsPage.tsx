@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatMoney } from "@/lib/money";
 import CycleSwitcher from "@/components/reports/CycleSwitcher";
@@ -13,18 +12,8 @@ import { useSpendingByCategory } from "@/components/hooks/useSpendingByCategory"
 import type { Range } from "@/types";
 
 const ReportsPage = () => {
-  const {
-    range,
-    setRange,
-    chartData,
-    rows,
-    totalSpent,
-    loading,
-    error,
-    hasData,
-    viewModel,
-    refetch,
-  } = useSpendingByCategory();
+  const { range, setRange, chartData, rows, totalSpent, loading, error, hasData, viewModel, refetch } =
+    useSpendingByCategory();
   const [chartMode, setChartMode] = useState<"pie" | "bar">(() => {
     if (typeof window === "undefined") return "pie";
     const saved = window.localStorage.getItem("finpath_reports_chart_mode");
@@ -38,10 +27,7 @@ const ReportsPage = () => {
     await refetch(next);
   };
 
-  const totalLabel = useMemo(
-    () => formatMoney(totalSpent.amount, totalSpent.currency),
-    [totalSpent],
-  );
+  const totalLabel = useMemo(() => formatMoney(totalSpent.amount, totalSpent.currency), [totalSpent]);
 
   const handleChartModeChange = (mode: "pie" | "bar") => {
     setChartMode(mode);
@@ -57,9 +43,7 @@ const ReportsPage = () => {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Raporty</h1>
-            <p className="text-muted-foreground">
-              Struktura wydatków w wybranym zakresie dat.
-            </p>
+            <p className="text-muted-foreground">Struktura wydatków w wybranym zakresie dat.</p>
           </div>
           <Card className="w-full max-w-xs">
             <CardHeader className="pb-2">
@@ -67,7 +51,9 @@ const ReportsPage = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-semibold">{totalLabel}</p>
-              <p className="text-xs text-muted-foreground">Zakres: {viewModel.range.startDate ?? "domyślny"} – {viewModel.range.endDate ?? "domyślny"}</p>
+              <p className="text-xs text-muted-foreground">
+                Zakres: {viewModel.range.startDate ?? "domyślny"} – {viewModel.range.endDate ?? "domyślny"}
+              </p>
             </CardContent>
           </Card>
         </div>
@@ -84,9 +70,7 @@ const ReportsPage = () => {
 
       {error && !loading && <ErrorBanner message={error} onRetry={() => refetch(range)} />}
 
-      {!loading && !error && !hasData && (
-        <EmptyState onCtaClick={() => (window.location.href = "/transactions")} />
-      )}
+      {!loading && !error && !hasData && <EmptyState onCtaClick={() => (window.location.href = "/transactions")} />}
 
       {!loading && !error && hasData && (
         <div className="grid gap-4 md:grid-cols-2">

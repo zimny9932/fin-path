@@ -5,10 +5,7 @@ type ApiFetchOptions = RequestInit & {
   needsAuth?: boolean;
 };
 
-export const apiFetch = async (
-  url: string,
-  options: ApiFetchOptions = {},
-) => {
+export const apiFetch = async (url: string, options: ApiFetchOptions = {}) => {
   const headers: HeadersInit = {
     Accept: "application/ld+json",
     ...options.headers,
@@ -25,9 +22,6 @@ export const apiFetch = async (
     const token = getAuthToken();
     if (token) {
       headers["Authorization"] = `Bearer ${token}`;
-    } else {
-      // W przyszłości można tu dodać przekierowanie do logowania
-      console.warn("Brak tokenu autoryzacyjnego dla żądania wymagającego uwierzytelnienia.");
     }
   }
 
@@ -43,10 +37,7 @@ export const apiFetch = async (
     }));
     throw {
       status: response.status,
-      message:
-        errorData.message ||
-        errorData.detail ||
-        "Wystąpił nieoczekiwany błąd.",
+      message: errorData.message || errorData.detail || "Wystąpił nieoczekiwany błąd.",
     };
   }
 
@@ -54,7 +45,7 @@ export const apiFetch = async (
   if (response.status === 204) {
     return response;
   }
-  
+
   return response.json();
 };
 
@@ -66,5 +57,3 @@ export const registerUser = async (data: RegistrationRequestDto) => {
     needsAuth: false,
   });
 };
-
-

@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
-import type { SubcategoryDTO } from '@/types';
-import { Label } from '@/components/ui/label';
+import { useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
+import type { SubcategoryDTO } from "@/types";
+import { Label } from "@/components/ui/label";
 
 interface CategoryPickerProps {
   value?: string;
   onChange: (id: string) => void;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
 }
 
 export const CategoryPicker = ({ value, onChange, type }: CategoryPickerProps) => {
@@ -21,8 +21,12 @@ export const CategoryPicker = ({ value, onChange, type }: CategoryPickerProps) =
       try {
         const data = await apiFetch(`/api/subcategories?type=${type}`);
         setItems(Array.isArray(data) ? data : []);
-      } catch (e: any) {
-        setError(e?.message || 'Nie udało się pobrać podkategorii.');
+      } catch (error: unknown) {
+        const message =
+          error && typeof error === "object" && "message" in error && typeof error.message === "string"
+            ? error.message
+            : "Nie udało się pobrać podkategorii.";
+        setError(message);
       } finally {
         setLoading(false);
       }

@@ -11,9 +11,7 @@ test.describe("Logowanie - happy path", () => {
     });
   });
 
-  test("pozwala zalogować istniejącego użytkownika i przejść do raportów", async ({
-    page,
-  }) => {
+  test("pozwala zalogować istniejącego użytkownika i przejść do raportów", async ({ page }) => {
     await page.goto("/login");
     await page.waitForLoadState("networkidle");
 
@@ -29,10 +27,9 @@ test.describe("Logowanie - happy path", () => {
       request.url().includes("/api/login") && request.method() === "POST";
 
     const loginRequestPromise = page.waitForRequest(loginRequestPredicate, { timeout: 15000 });
-    const loginResponsePromise = page.waitForResponse(
-      (response) => loginRequestPredicate(response.request()),
-      { timeout: 20000 }
-    );
+    const loginResponsePromise = page.waitForResponse((response) => loginRequestPredicate(response.request()), {
+      timeout: 20000,
+    });
 
     await page.getByRole("button", { name: "Zaloguj się" }).click();
 
@@ -42,9 +39,7 @@ test.describe("Logowanie - happy path", () => {
         .locator("p.text-sm.text-red-500")
         .allInnerTexts()
         .catch(() => []);
-      throw new Error(
-        `Żądanie /api/login nie zostało wysłane. Błędy walidacji: ${fieldErrors.join(" | ")}`
-      );
+      throw new Error(`Żądanie /api/login nie zostało wysłane. Błędy walidacji: ${fieldErrors.join(" | ")}`);
     }
 
     const failedRequest = await page
@@ -55,13 +50,25 @@ test.describe("Logowanie - happy path", () => {
       .catch(() => null);
 
     if (failedRequest) {
-      throw new Error(
-        `Login request failed: ${failedRequest.failure()?.errorText ?? "unknown error"}`
-      );
+      throw new Error(`Login request failed: ${failedRequest.failure()?.errorText ?? "unknown error"}`);
     }
 
-    const loginResponse = await loginResponsePromise;
-    expect(loginResponse.ok()).toBeTruthy();
+    const loginResponse = await loginResponsePromise.catch((error: unknown) => {
+      throw new Error(`Nie otrzymano odpowiedzi /api/login w limicie czasu: ${String(error)}`);
+    });
+
+    if (!loginResponse.ok()) {
+      let responseBody = "";
+      try {
+        responseBody = await loginResponse.text();
+      } catch (readError) {
+        responseBody = `Nie udało się odczytać body odpowiedzi: ${String(readError)}`;
+      }
+
+      throw new Error(
+        `Nieudane logowanie. Status: ${loginResponse.status()} ${loginResponse.statusText()}. Body: ${responseBody}`,
+      );
+    }
 
     await page.waitForURL(/\/reports/);
     await expect(page.getByRole("heading", { name: "Raporty" })).toBeVisible();

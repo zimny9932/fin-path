@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
-import { apiFetch } from '@/lib/api';
+import { useCallback, useEffect, useState } from "react";
+import { apiFetch } from "@/lib/api";
 import type {
   PaginationDTO,
   TransactionDTO,
   TransactionFilters,
   TransactionRowVM,
   TransactionsResponse,
-} from '@/types';
+} from "@/types";
 
 const formatAmount = (amountInMinor: number, currency: string) =>
-  new Intl.NumberFormat('pl-PL', {
-    style: 'currency',
+  new Intl.NumberFormat("pl-PL", {
+    style: "currency",
     currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
@@ -19,7 +19,7 @@ const formatAmount = (amountInMinor: number, currency: string) =>
 const mapTransaction = (dto: TransactionDTO): TransactionRowVM => ({
   id: dto.id,
   date: dto.date,
-  formattedDate: new Date(dto.date).toLocaleDateString('pl-PL'),
+  formattedDate: new Date(dto.date).toLocaleDateString("pl-PL"),
   amount: dto.amount,
   formattedAmount: formatAmount(dto.amount.amount, dto.amount.currency),
   subcategoryId: dto.subcategory.id,
@@ -31,62 +31,64 @@ const mapTransaction = (dto: TransactionDTO): TransactionRowVM => ({
 const buildQuery = (filters: TransactionFilters): string => {
   const params = new URLSearchParams();
 
-  params.set('page', filters.page.toString());
-  params.set('itemsPerPage', filters.limit.toString());
+  params.set("page", filters.page.toString());
+  params.set("itemsPerPage", filters.limit.toString());
 
   if (filters.startDate) {
-    params.set('date[after]', filters.startDate);
+    params.set("date[after]", filters.startDate);
   }
 
   if (filters.endDate) {
-    params.set('date[before]', filters.endDate);
+    params.set("date[before]", filters.endDate);
   }
 
-  const sortField = filters.sortBy === 'amount' ? 'amount.amount' : 'date';
+  const sortField = filters.sortBy === "amount" ? "amount.amount" : "date";
   params.set(`order[${sortField}]`, filters.sortOrder);
 
   return `/api/transactions?${params.toString()}`;
 };
 
-const normalizeResponse = (
-  apiData: any,
-  filters: TransactionFilters,
-): TransactionsResponse => {
-  // ApiPlatform Hydra (standard)
-  if (apiData && Array.isArray(apiData['hydra:member'])) {
-    const items = apiData['hydra:member'] as TransactionDTO[];
-    const totalItems = apiData['hydra:totalItems'] ?? items.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
+const normalizeResponse = (apiData: unknown, filters: TransactionFilters): TransactionsResponse => {
+  if (apiData && typeof apiData === "object") {
+    const obj = apiData as Record<string, unknown>;
 
-    return {
-      items,
-      pagination: {
-        currentPage: filters.page,
-        totalPages,
-        totalItems,
-      },
-    };
-  }
+    // ApiPlatform Hydra (standard)
+    if (Array.isArray(obj["hydra:member"])) {
+      const items = obj["hydra:member"] as TransactionDTO[];
+      const totalItems =
+        typeof obj["hydra:totalItems"] === "number" ? obj["hydra:totalItems"] : (obj["hydra:member"] as []).length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
 
-  // ApiPlatform with @context/@id (Accept: application/ld+json) but short keys
-  if (apiData && Array.isArray(apiData.member)) {
-    const items = apiData.member as TransactionDTO[];
-    const totalItems = apiData.totalItems ?? items.length;
-    const totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
+      return {
+        items,
+        pagination: {
+          currentPage: filters.page,
+          totalPages,
+          totalItems,
+        },
+      };
+    }
 
-    return {
-      items,
-      pagination: {
-        currentPage: filters.page,
-        totalPages,
-        totalItems,
-      },
-    };
-  }
+    // ApiPlatform with @context/@id (Accept: application/ld+json) but short keys
+    if (Array.isArray(obj.member)) {
+      const items = obj.member as TransactionDTO[];
+      const totalItems = typeof obj.totalItems === "number" ? obj.totalItems : items.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / filters.limit));
 
-  // Custom shape with items + pagination
-  if (apiData && Array.isArray(apiData.items) && apiData.pagination) {
-    return apiData as TransactionsResponse;
+      return {
+        items,
+        pagination: {
+          currentPage: filters.page,
+          totalPages,
+          totalItems,
+        },
+      };
+    }
+
+    // Custom shape with items + pagination
+    if (Array.isArray(obj.items) && obj.pagination && typeof obj.pagination === "object") {
+      return obj as TransactionsResponse;
+    }
   }
 
   // Array fallback
@@ -122,12 +124,25 @@ export const useTransactions = (initialFilters: TransactionFilters) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const toErrorMessage = (maybeError: unknown, fallback: string) => {
+    if (typeof maybeError === "string") return maybeError;
+    if (
+      maybeError &&
+      typeof maybeError === "object" &&
+      "message" in maybeError &&
+      typeof maybeError.message === "string"
+    ) {
+      return maybeError.message;
+    }
+    return fallback;
+  };
+
   const fetchData = useCallback(async () => {
     if (filters.startDate && filters.endDate) {
       const start = new Date(filters.startDate);
       const end = new Date(filters.endDate);
       if (start > end) {
-        setError('Data początkowa nie może być późniejsza niż końcowa.');
+        setError("Data początkowa nie może być późniejsza niż końcowa.");
         return;
       }
     }
@@ -142,8 +157,8 @@ export const useTransactions = (initialFilters: TransactionFilters) => {
 
       setData(normalized.items.map(mapTransaction));
       setPagination(normalized.pagination);
-    } catch (e: any) {
-      setError(e?.message || 'Nie udało się pobrać transakcji.');
+    } catch (error: unknown) {
+      setError(toErrorMessage(error, "Nie udało się pobrać transakcji."));
     } finally {
       setIsLoading(false);
     }

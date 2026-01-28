@@ -23,5 +23,3 @@ export const clearTokens = (): void => {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
   }
 };
-
-

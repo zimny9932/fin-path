@@ -1,20 +1,21 @@
 ---
-import { clearTokens } from "@/lib/auth";
-
 export const prerender = false;
 ---
 
-<script>
+<!-- eslint-disable prettier/prettier -->
+<script is:inline>
   if (typeof window !== "undefined") {
     // Czyść tokeny lokalne
-    import("/src/lib/auth").then((mod) => {
-      mod.clearTokens?.();
-      // Opcjonalnie wyczyść inne dane sesji
-      sessionStorage.clear?.();
-    }).finally(() => {
-      const redirect = "/login";
-      window.location.replace(redirect);
-    });
+    import("/src/lib/auth")
+      .then((mod) => {
+        mod.clearTokens?.();
+        // Opcjonalnie wyczyść inne dane sesji
+        sessionStorage.clear?.();
+      })
+      .finally(() => {
+        const redirect = "/login";
+        window.location.replace(redirect);
+      });
   }
 </script>
 

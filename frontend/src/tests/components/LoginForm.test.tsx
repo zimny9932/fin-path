@@ -7,11 +7,7 @@ import * as useLoginFormHook from "@/components/hooks/useLoginForm";
 
 vi.mock("@/components/hooks/useLoginForm");
 
-const mockUseLoginForm = (
-  isLoading = false,
-  errors = {},
-  formData = { email: "", password: "" }
-) => {
+const mockUseLoginForm = (isLoading = false, errors = {}, formData = { email: "", password: "" }) => {
   return {
     formData,
     errors,
@@ -27,16 +23,12 @@ describe("LoginForm", () => {
   });
 
   it("should render the login form correctly", () => {
-    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(
-      mockUseLoginForm()
-    );
+    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(mockUseLoginForm());
     render(<LoginForm />);
 
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/hasło/i)).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /zaloguj się/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /zaloguj się/i })).toBeInTheDocument();
   });
 
   it("should display validation errors", () => {
@@ -44,9 +36,7 @@ describe("LoginForm", () => {
       email: "Pole jest wymagane",
       password: "Hasło jest za krótkie",
     };
-    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(
-      mockUseLoginForm(false, errors)
-    );
+    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(mockUseLoginForm(false, errors));
     render(<LoginForm />);
 
     expect(screen.getByText("Pole jest wymagane")).toBeInTheDocument();
@@ -84,9 +74,7 @@ describe("LoginForm", () => {
   });
 
   it("should disable the submit button when isLoading is true", () => {
-    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(
-      mockUseLoginForm(true)
-    );
+    (useLoginFormHook.useLoginForm as vi.Mock).mockReturnValue(mockUseLoginForm(true));
     render(<LoginForm />);
 
     const submitButton = screen.getByRole("button", { name: /logowanie.../i });

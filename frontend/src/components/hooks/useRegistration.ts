@@ -13,12 +13,8 @@ const registrationSchema = z
       .string()
       .min(1, { message: "Adres e-mail jest wymagany." })
       .email({ message: "Proszę podać poprawny adres e-mail." }),
-    password: z
-      .string()
-      .min(8, { message: "Hasło musi mieć co najmniej 8 znaków." }),
-    passwordConfirmation: z
-      .string()
-      .min(1, { message: "Potwierdzenie hasła jest wymagane." }),
+    password: z.string().min(8, { message: "Hasło musi mieć co najmniej 8 znaków." }),
+    passwordConfirmation: z.string().min(1, { message: "Potwierdzenie hasła jest wymagane." }),
   })
   .refine((data) => data.password === data.passwordConfirmation, {
     message: "Hasła muszą być identyczne.",
@@ -48,11 +44,13 @@ export const useRegistration = () => {
       saveTokens(response);
       toast.success("Konto zostało pomyślnie utworzone!");
       window.location.href = "/onboarding";
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const normalizedError =
+        error && typeof error === "object" ? (error as { status?: number; message?: string }) : undefined;
       const errorMessage =
-        error.status === 409
+        normalizedError?.status === 409
           ? "Ten adres e-mail jest już zajęty."
-          : error.message || "Wystąpił nieoczekiwany błąd.";
+          : normalizedError?.message || "Wystąpił nieoczekiwany błąd.";
       setApiError(errorMessage);
       form.setError("email", { type: "manual", message: errorMessage });
       toast.error("Rejestracja nie powiodła się.");

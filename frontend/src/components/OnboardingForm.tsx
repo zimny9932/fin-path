@@ -1,11 +1,5 @@
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiFetch } from "@/lib/api";
 import type { OnboardingFormViewModel } from "@/types";
 import { useState } from "react";
@@ -45,8 +39,13 @@ const OnboardingForm = () => {
       });
 
       window.location.href = "/budgets/plan";
-    } catch (error: any) {
-      if (error.status === 401) {
+    } catch (error: unknown) {
+      const maybeError =
+        typeof error === "object" && error !== null
+          ? (error as { status?: number; message?: string })
+          : { status: undefined, message: undefined };
+
+      if (maybeError.status === 401) {
         // Potencjalnie przekierowanie na stronę logowania
         setViewModel((prev) => ({
           ...prev,
@@ -55,9 +54,7 @@ const OnboardingForm = () => {
       } else {
         setViewModel((prev) => ({
           ...prev,
-          error:
-            error.message ||
-            "Wystąpił błąd. Spróbuj ponownie.",
+          error: maybeError.message || "Wystąpił błąd. Spróbuj ponownie.",
         }));
       }
     } finally {
@@ -70,17 +67,14 @@ const OnboardingForm = () => {
       <div className="text-center">
         <h1 className="text-3xl font-bold">Konfiguracja konta</h1>
         <p className="text-muted-foreground mt-2">
-          Wybierz dzień, w którym rozpoczyna się Twój miesięczny cykl
-          rozliczeniowy. To pomoże nam dokładnie śledzić Twoje finanse.
+          Wybierz dzień, w którym rozpoczyna się Twój miesięczny cykl rozliczeniowy. To pomoże nam dokładnie śledzić
+          Twoje finanse.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label
-            htmlFor="billing-day"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300"
-          >
+          <label htmlFor="billing-day" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Dzień rozpoczęcia cyklu
           </label>
           <Select
@@ -101,18 +95,12 @@ const OnboardingForm = () => {
           </Select>
         </div>
 
-        <Button
-          type="submit"
-          className="w-full"
-          disabled={!viewModel.selectedDay || viewModel.isLoading}
-        >
+        <Button type="submit" className="w-full" disabled={!viewModel.selectedDay || viewModel.isLoading}>
           {viewModel.isLoading ? "Zapisywanie..." : "Zapisz i kontynuuj"}
         </Button>
       </form>
 
-      {viewModel.error && (
-        <p className="text-sm text-red-500 text-center">{viewModel.error}</p>
-      )}
+      {viewModel.error && <p className="text-sm text-red-500 text-center">{viewModel.error}</p>}
     </div>
   );
 };
