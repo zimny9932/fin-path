@@ -115,9 +115,12 @@ jobs:
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
+      BACKEND_HOST: ${{ secrets.BACKEND_HOST || '127.0.0.1' }}
+      BACKEND_PORT: ${{ secrets.BACKEND_PORT || '8081' }}
+      BACKEND_URL: "http://${{ secrets.BACKEND_HOST || '127.0.0.1' }}:${{ secrets.BACKEND_PORT || '8081' }}"
       PLAYWRIGHT_HOST: ${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}
       PLAYWRIGHT_PORT: ${{ secrets.PLAYWRIGHT_PORT || '3000' }}
-      PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || 'http://127.0.0.1:3000' }}
+      PLAYWRIGHT_BASE_URL: "http://${{ secrets.PLAYWRIGHT_HOST || '127.0.0.1' }}:${{ secrets.PLAYWRIGHT_PORT || '3000' }}"
       NODE_V8_COVERAGE: ${{ github.workspace }}/frontend/coverage/playwright
     services:
       postgres:
@@ -173,8 +176,26 @@ jobs:
 
       - name: Start backend server
         run: |
-          nohup php -S 0.0.0.0:8081 -t public public/index.php > /tmp/backend-server.log 2>&1 &
+          nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
           echo $! > /tmp/backend-server.pid
+        working-directory: .
+
+      - name: Wait for backend HTTP healthcheck
+        run: |
+          for i in {1..30}; do
+            status=$(curl -s -o /dev/null -w "%{http_code}" "http://${BACKEND_HOST}:${BACKEND_PORT}/api/login" || true)
+            if [[ "$status" == "401" || "$status" == "400" || "$status" == "405" ]]; then
+              exit 0
+            fi
+            sleep 2
+          done
+
+          echo "Backend server not responding on http://${BACKEND_HOST}:${BACKEND_PORT}/api/login" >&2
+          if [ -f /tmp/backend-server.log ]; then
+            echo "Last backend log lines:" >&2
+            tail -n 200 /tmp/backend-server.log >&2
+          fi
+          exit 1
         working-directory: .
 
       - name: Setup frontend

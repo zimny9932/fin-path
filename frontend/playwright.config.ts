@@ -5,6 +5,7 @@ const HOST = process.env.PLAYWRIGHT_HOST ?? "localhost";
 const PORT = process.env.PLAYWRIGHT_PORT ?? "3000";
 // Use truthy check so empty env values fall back to default localhost URL.
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || `http://${HOST}:${PORT}`;
+const webServerTimeout = Number(process.env.PLAYWRIGHT_WEB_SERVER_TIMEOUT ?? 60000);
 
 /**
  * Read environment variables from file.
@@ -81,6 +82,6 @@ export default defineConfig({
     command: `npm run dev -- --host ${HOST} --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
-    timeout: 5000,
+    timeout: webServerTimeout,
   },
 });
