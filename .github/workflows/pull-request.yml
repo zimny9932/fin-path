@@ -135,6 +135,8 @@ jobs:
       DATABASE_URL: ${{ secrets.DATABASE_URL || 'postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8' }}
       DEFAULT_URI: ${{ secrets.DEFAULT_URI || '' }}
       JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE || 'test-passphrase' }}
+      JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY || 'config/jwt/private.pem' }}
+      JWT_PUBLIC_KEY: ${{ secrets.JWT_PUBLIC_KEY || 'config/jwt/public.pem' }}
       CORS_ALLOW_ORIGIN: ${{ secrets.CORS_ALLOW_ORIGIN || '' }}
       VAR_DUMPER_SERVER: ${{ secrets.VAR_DUMPER_SERVER || '' }}
       BACKEND_HOST: ${{ secrets.BACKEND_HOST || '127.0.0.1' }}
@@ -167,9 +169,15 @@ jobs:
         run: |
           cat > .env.local <<'EOF'
           DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          JWT_SECRET_KEY=${JWT_SECRET_KEY:-config/jwt/private.pem}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY:-config/jwt/public.pem}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE:-test-passphrase}
           EOF
           cat > .env.integration.local <<'EOF'
           DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          JWT_SECRET_KEY=${JWT_SECRET_KEY:-config/jwt/private.pem}
+          JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY:-config/jwt/public.pem}
+          JWT_PASSPHRASE=${JWT_PASSPHRASE:-test-passphrase}
           EOF
 
       - name: Debug env and config files
@@ -221,8 +229,11 @@ jobs:
           APP_ENV: ${{ env.APP_ENV }}
           APP_DEBUG: 0
           DATABASE_URL: ${{ env.DATABASE_URL }}
+          JWT_PASSPHRASE: ${{ env.JWT_PASSPHRASE }}
+          JWT_SECRET_KEY: ${{ env.JWT_SECRET_KEY }}
+          JWT_PUBLIC_KEY: ${{ env.JWT_PUBLIC_KEY }}
         run: |
-          export APP_ENV APP_DEBUG DATABASE_URL
+          export APP_ENV APP_DEBUG DATABASE_URL JWT_PASSPHRASE JWT_SECRET_KEY JWT_PUBLIC_KEY
           echo "=== Backend env for php -S ==="
           env | sort
           echo "=== Using DATABASE_URL ==="
