@@ -68,6 +68,18 @@ jobs:
           EOF
         working-directory: .
 
+      - name: Debug env and config files
+        run: |
+          echo "--- ENV ---"
+          printenv | sort
+          echo "--- .env ---"
+          sed -n '1,120p' .env || true
+          echo "--- .env.local ---"
+          cat .env.local || true
+          echo "--- .env.integration.local ---"
+          cat .env.integration.local || true
+        working-directory: .
+
       - name: Setup backend
         uses: ./.github/actions/setup-backend
         with:
@@ -191,6 +203,14 @@ jobs:
           DATABASE_URL: ${{ env.DATABASE_URL }}
         run: |
           export APP_ENV APP_DEBUG DATABASE_URL
+          echo "=== Backend env for php -S ==="
+          env | sort
+          echo "=== Using DATABASE_URL ==="
+          echo "$DATABASE_URL"
+          echo "=== .env.local ==="
+          cat .env.local || true
+          echo "=== .env.integration.local ==="
+          cat .env.integration.local || true
           nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
           echo $! > /tmp/backend-server.pid
         working-directory: .
@@ -210,6 +230,12 @@ jobs:
             echo "Last backend log lines:" >&2
             tail -n 200 /tmp/backend-server.log >&2
           fi
+          echo "--- Environment seen in healthcheck step ---" >&2
+          env | sort >&2
+          echo "--- .env.local ---" >&2
+          cat .env.local >&2 || true
+          echo "--- .env.integration.local ---" >&2
+          cat .env.integration.local >&2 || true
           exit 1
         working-directory: .
 
