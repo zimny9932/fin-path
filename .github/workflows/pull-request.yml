@@ -58,6 +58,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Override env for CI backend
+        run: |
+          cat > .env.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
+        working-directory: .
+
       - name: Setup backend
         uses: ./.github/actions/setup-backend
         with:
