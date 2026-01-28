@@ -128,7 +128,7 @@ jobs:
     environment: integration
     defaults:
       run:
-        working-directory: frontend
+        working-directory: ${{ github.workspace }}
     env:
       APP_ENV: integration
       APP_SECRET: ${{ secrets.APP_SECRET || 'test-secret' }}
@@ -162,6 +162,26 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+
+      - name: Override env for CI backend
+        run: |
+          cat > .env.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
+          cat > .env.integration.local <<'EOF'
+          DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
+          EOF
+
+      - name: Debug env and config files
+        run: |
+          echo "--- ENV ---"
+          printenv | sort
+          echo "--- .env ---"
+          sed -n '1,120p' .env || true
+          echo "--- .env.local ---"
+          cat .env.local || true
+          echo "--- .env.integration.local ---"
+          cat .env.integration.local || true
 
       - name: Setup backend
         uses: ./.github/actions/setup-backend
@@ -247,11 +267,13 @@ jobs:
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+        working-directory: frontend
 
       - name: Run Playwright e2e tests
         env:
           PLAYWRIGHT_WEB_SERVER_TIMEOUT: 120000
         run: npx playwright test --config=playwright.config.ts
+        working-directory: frontend
 
       - name: Dump backend log on failure
         if: failure() || cancelled()
