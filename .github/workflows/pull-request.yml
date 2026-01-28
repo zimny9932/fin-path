@@ -66,7 +66,7 @@ jobs:
           cat > .env.integration.local <<'EOF'
           DATABASE_URL=postgresql://app:app@127.0.0.1:5432/fin_path?serverVersion=17&charset=utf8
           EOF
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Debug env and config files
         run: |
@@ -78,7 +78,7 @@ jobs:
           cat .env.local || true
           echo "--- .env.integration.local ---"
           cat .env.integration.local || true
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Setup backend
         uses: ./.github/actions/setup-backend
@@ -182,19 +182,19 @@ jobs:
           docker ps --format '{{.Names}} {{.Status}}' --filter name=postgres || true
           docker logs postgres || true
           exit 1
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Generate JWT keypair
         run: php bin/console lexik:jwt:generate-keypair --no-interaction
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Run migrations
         run: php bin/console doctrine:migrations:migrate --no-interaction
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Load fixtures for e2e
         run: php bin/console doctrine:fixtures:load --no-interaction
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Start backend server
         env:
@@ -213,7 +213,7 @@ jobs:
           cat .env.integration.local || true
           nohup php -S "${BACKEND_HOST:-127.0.0.1}:${BACKEND_PORT:-8081}" -t public public/index.php > /tmp/backend-server.log 2>&1 &
           echo $! > /tmp/backend-server.pid
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Wait for backend HTTP healthcheck
         run: |
@@ -237,7 +237,7 @@ jobs:
           echo "--- .env.integration.local ---" >&2
           cat .env.integration.local >&2 || true
           exit 1
-        working-directory: .
+        working-directory: ${{ github.workspace }}
 
       - name: Setup frontend
         uses: ./.github/actions/setup-frontend
